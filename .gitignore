@@ -11,3 +11,7 @@
 
 es.log
 *.bak
+/.gradle/
+/gradle/
+/out/
+/build/
