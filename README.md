@@ -21,6 +21,16 @@ mongodb 到elasticsearch数据同步
 
 [使用参考文档](https://esdoc.bbossgroups.com/#/db-es-tool)
 
+# 导入maven坐标
+
+```xml
+<dependency>
+  <groupId>com.bbossgroups.plugins</groupId>
+  <artifactId>bboss-elasticsearch-rest-mongodb</artifactId>
+  <version>5.9.2</version>
+  <scope>compile</scope>
+</dependency>
+```
 
 # 构建部署
 ## 准备工作
