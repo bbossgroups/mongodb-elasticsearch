@@ -17,7 +17,9 @@ package org.frameworkset.elasticsearch.imp;
 
 import org.frameworkset.elasticsearch.ElasticSearchHelper;
 import org.frameworkset.elasticsearch.client.DataStream;
+import org.frameworkset.elasticsearch.client.ExportResultHandler;
 import org.frameworkset.elasticsearch.client.mongodb2es.MongoDB2ESExportBuilder;
+import org.frameworkset.elasticsearch.client.task.TaskCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,7 +137,7 @@ public class Mongodb2ESdemo {
 		//增量配置开始
 		importBuilder.setNumberLastValueColumn("lastAccessedTime");//手动指定数字增量查询字段，默认采用上面设置的sql语句中的增量变量名称作为增量查询字段的名称，指定以后就用指定的字段
 //		importBuilder.setDateLastValueColumn("log_id");//手动指定日期增量查询字段，默认采用上面设置的sql语句中的增量变量名称作为增量查询字段的名称，指定以后就用指定的字段
-		importBuilder.setFromFirst(false);//任务重启时，重新开始采集数据，true 重新开始，false不重新开始，适合于每次全量导入数据的情况，如果是全量导入，可以先删除原来的索引数据
+		importBuilder.setFromFirst(true);//任务重启时，重新开始采集数据，true 重新开始，false不重新开始，适合于每次全量导入数据的情况，如果是全量导入，可以先删除原来的索引数据
 		importBuilder.setLastValueStorePath("mongodb_import");//记录上次采集的增量字段值的文件路径，作为下次增量（或者重启后）采集数据的起点，不同的任务这个路径要不一样
 //		importBuilder.setLastValueStoreTableName("logs");//记录上次采集的增量字段值的表，可以不指定，采用默认表名increament_tab
 //		importBuilder.setLastValueType(ImportIncreamentConfig.TIMESTAMP_TYPE);//如果没有指定增量查询字段名称，则需要指定字段类型：ImportIncreamentConfig.NUMBER_TYPE 数字类型
@@ -201,12 +203,33 @@ public class Mongodb2ESdemo {
 		importBuilder.setThreadCount(50);//设置批量导入线程池工作线程数量
 		importBuilder.setContinueOnError(true);//任务出现异常，是否继续执行作业：true（默认值）继续执行 false 中断作业执行
 		importBuilder.setAsyn(false);//true 异步方式执行，不等待所有导入作业任务结束，方法快速返回；false（默认值） 同步方式执行，等待所有导入作业任务结束，所有作业结束后方法才返回
-		importBuilder.setEsIdField("log_id");//设置文档主键，不设置，则自动产生文档id
+		importBuilder.setEsIdField("_id");//设置文档主键，不设置，则自动产生文档id
 //		importBuilder.setDebugResponse(false);//设置是否将每次处理的reponse打印到日志文件中，默认false，不打印响应报文将大大提升性能，只有在调试需要的时候才打开，log日志级别同时要设置为INFO
 //		importBuilder.setDiscardBulkResponse(true);//设置是否需要批量处理的响应报文，不需要设置为false，true为需要，默认true，如果不需要响应报文将大大提升处理速度
 
 		importBuilder.setDebugResponse(false);//设置是否将每次处理的reponse打印到日志文件中，默认false
 		importBuilder.setDiscardBulkResponse(false);//设置是否需要批量处理的响应报文，不需要设置为false，true为需要，默认false
+		importBuilder.setExportResultHandler(new ExportResultHandler<String,String>() {
+			@Override
+			public void success(TaskCommand<String,String> taskCommand, String result) {
+				System.out.println(result);
+			}
+
+			@Override
+			public void error(TaskCommand<String,String> taskCommand, String result) {
+				System.out.println(result);
+			}
+
+			@Override
+			public void exception(TaskCommand<String,String> taskCommand, Exception exception) {
+
+			}
+
+			@Override
+			public int getMaxRetry() {
+				return 0;
+			}
+		});
 		/**
 		 importBuilder.setEsIdGenerator(new EsIdGenerator() {
 		 //如果指定EsIdGenerator，则根据下面的方法生成文档id，
