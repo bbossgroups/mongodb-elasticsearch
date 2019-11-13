@@ -16,8 +16,10 @@ package org.frameworkset.elasticsearch.imp;
  */
 
 import org.frameworkset.elasticsearch.ElasticSearchHelper;
+import org.frameworkset.elasticsearch.client.DataRefactor;
 import org.frameworkset.elasticsearch.client.DataStream;
 import org.frameworkset.elasticsearch.client.ExportResultHandler;
+import org.frameworkset.elasticsearch.client.context.Context;
 import org.frameworkset.elasticsearch.client.mongodb2es.MongoDB2ESExportBuilder;
 import org.frameworkset.elasticsearch.client.task.TaskCommand;
 import org.slf4j.Logger;
@@ -42,7 +44,6 @@ public class Mongodb2ESdemo {
 		boolean dropIndice = true;//CommonLauncher.getBooleanAttribute("dropIndice",false);//同时指定了默认值
 
 		dbdemo.scheduleTimestampImportData(dropIndice);
-//		dbdemo.scheduleImportData(dropIndice);
 	}
 
 
@@ -63,24 +64,24 @@ public class Mongodb2ESdemo {
 		}
 
 
-		//指定导入数据的sql语句，必填项，可以设置自己的提取逻辑，
-		// 设置增量变量log_id，增量变量名称#[log_id]可以多次出现在sql语句的不同位置中，例如：
-		// select * from td_sm_log where log_id > #[log_id] and parent_id = #[log_id]
-		// log_id和数据库对应的字段一致,就不需要设置setNumberLastValueColumn和setNumberLastValueColumn信息，
-		// 但是需要设置setLastValueType告诉工具增量字段的类型
+		//mongodb的相关配置参数
 
-		importBuilder.setName("session").setDb("sessiondb")
+		importBuilder.setName("session")
+				.setDb("sessiondb")
 				.setDbCollection("sessionmonitor_sessions")
 				.setConnectTimeout(10000)
-				.setWriteConcern("JOURNAL_SAFE").setReadPreference("")
-				.setSocketTimeout(1500)
+				.setWriteConcern("JOURNAL_SAFE")
+				.setReadPreference("")
+				.setMaxWaitTime(10000)
+				.setSocketTimeout(1500).setSocketKeepAlive(true)
 				.setConnectionsPerHost(100)
 				.setThreadsAllowedToBlockForConnectionMultiplier(6)
-				.setServerAddresses("127.0.0.1:27017")
+				.setServerAddresses("127.0.0.1:27017\n127.0.0.1:27018")//多个地址用回车换行符分割：127.0.0.1:27017\n127.0.0.1:27018
 				// mechanism 取值范围：PLAIN GSSAPI MONGODB-CR MONGODB-X509，默认为MONGODB-CR
 				//String database,String userName,String password,String mechanism
 				//https://www.iteye.com/blog/yin-bp-2064662
 //				.buildClientMongoCredential("sessiondb","bboss","bboss","MONGODB-CR")
+//				.setOption("")
 				.setAutoConnectRetry(true);
 //		importBuilder.addIgnoreFieldMapping("remark1");
 //		importBuilder.setSql("select * from td_sm_log ");
@@ -88,7 +89,7 @@ public class Mongodb2ESdemo {
 		 * es相关配置
 		 */
 		importBuilder
-				.setIndex("mongodbdemo") //必填项
+				.setIndex("mongodbdemo") //必填项，索引名称
 				.setIndexType("mongodbdemo") //es 7以后的版本不需要设置indexType，es7以前的版本必需设置indexType
 //				.setRefreshOption("refresh")//可选项，null表示不实时刷新，importBuilder.setRefreshOption("refresh");表示实时刷新
 				.setPrintTaskLog(true) //可选项，true 打印任务执行日志（耗时，处理记录数） false 不打印，默认值false
@@ -135,12 +136,12 @@ public class Mongodb2ESdemo {
 //		});
 //		//设置任务执行拦截器结束，可以添加多个
 		//增量配置开始
-		importBuilder.setNumberLastValueColumn("lastAccessedTime");//手动指定数字增量查询字段，默认采用上面设置的sql语句中的增量变量名称作为增量查询字段的名称，指定以后就用指定的字段
-//		importBuilder.setDateLastValueColumn("log_id");//手动指定日期增量查询字段，默认采用上面设置的sql语句中的增量变量名称作为增量查询字段的名称，指定以后就用指定的字段
+		importBuilder.setNumberLastValueColumn("lastAccessedTime");//手动指定数字增量查询字段
+//		importBuilder.setDateLastValueColumn("log_id");//手动指定日期增量查询字段
 		importBuilder.setFromFirst(true);//任务重启时，重新开始采集数据，true 重新开始，false不重新开始，适合于每次全量导入数据的情况，如果是全量导入，可以先删除原来的索引数据
 		importBuilder.setLastValueStorePath("mongodb_import");//记录上次采集的增量字段值的文件路径，作为下次增量（或者重启后）采集数据的起点，不同的任务这个路径要不一样
 //		importBuilder.setLastValueStoreTableName("logs");//记录上次采集的增量字段值的表，可以不指定，采用默认表名increament_tab
-//		importBuilder.setLastValueType(ImportIncreamentConfig.TIMESTAMP_TYPE);//如果没有指定增量查询字段名称，则需要指定字段类型：ImportIncreamentConfig.NUMBER_TYPE 数字类型
+//		importBuilder.setLastValueType(ImportIncreamentConfig.TIMESTAMP_TYPE);//指定字段类型：ImportIncreamentConfig.NUMBER_TYPE 数字类型,ImportIncreamentConfig.TIMESTAMP_TYPE为时间类型
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		try {
 			Date date = format.parse("2000-01-01");
@@ -155,7 +156,7 @@ public class Mongodb2ESdemo {
 		//映射和转换配置开始
 //		/**
 //		 * db-es mapping 表字段名称到es 文档字段的映射：比如document_id -> docId
-//		 * 可以配置mapping，也可以不配置，默认基于java 驼峰规则进行db field-es field的映射和转换
+//		 *
 //		 */
 //		importBuilder.addFieldMapping("document_id","docId")
 //				.addFieldMapping("docwtime","docwTime")
@@ -178,21 +179,17 @@ public class Mongodb2ESdemo {
 //		/**
 //		 * 重新设置es数据结构
 //		 */
-//		importBuilder.setDataRefactor(new DataRefactor() {
-//			public void refactor(Context context) throws Exception  {
-//				CustomObject customObject = new CustomObject();
-//				customObject.setAuthor((String)context.getValue("author"));
-//				customObject.setTitle((String)context.getValue("title"));
-//				customObject.setSubtitle((String)context.getValue("subtitle"));
-//				customObject.setIds(new int[]{1,2,3});
-//				context.addFieldValue("docInfo",customObject);//如果还需要构建更多的内部对象，可以继续构建
-//
-//				//上述三个属性已经放置到docInfo中，如果无需再放置到索引文档中，可以忽略掉这些属性
+		importBuilder.setDataRefactor(new DataRefactor() {
+			public void refactor(Context context) throws Exception  {
+				 //添加字段extfiled到记录中，值为1
+				 context.addFieldValue("extfiled",1);
+
+				//上述三个属性已经放置到docInfo中，如果无需再放置到索引文档中，可以忽略掉这些属性
 //				context.addIgnoreFieldMapping("author");
 //				context.addIgnoreFieldMapping("title");
 //				context.addIgnoreFieldMapping("subtitle");
-//			}
-//		});
+			}
+		});
 		//映射和转换配置结束
 
 		/**
@@ -243,14 +240,12 @@ public class Mongodb2ESdemo {
 		 });
 		 */
 		/**
-		 * 执行数据库表数据导入es操作
+		 * 构建DataStream，执行mongodb数据到es的同步操作
 		 */
 		DataStream dataStream = importBuilder.builder();
-		dataStream.execute();//执行导入操作
+		dataStream.execute();//执行同步操作
 
 		System.out.println();
-
-
 	}
 
 }
