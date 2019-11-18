@@ -20,8 +20,8 @@ import org.frameworkset.elasticsearch.client.DataRefactor;
 import org.frameworkset.elasticsearch.client.DataStream;
 import org.frameworkset.elasticsearch.client.ExportResultHandler;
 import org.frameworkset.elasticsearch.client.context.Context;
-import org.frameworkset.elasticsearch.client.mongodb2es.MongoDB2ESExportBuilder;
 import org.frameworkset.elasticsearch.client.task.TaskCommand;
+import org.frameworkset.tran.mongodb.input.es.MongoDB2ESExportBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +76,7 @@ public class Mongodb2ESdemo {
 				.setSocketTimeout(1500).setSocketKeepAlive(true)
 				.setConnectionsPerHost(100)
 				.setThreadsAllowedToBlockForConnectionMultiplier(6)
-				.setServerAddresses("127.0.0.1:27017\n127.0.0.1:27018")//多个地址用回车换行符分割：127.0.0.1:27017\n127.0.0.1:27018
+				.setServerAddresses("127.0.0.1:27017")//多个地址用回车换行符分割：127.0.0.1:27017\n127.0.0.1:27018
 				// mechanism 取值范围：PLAIN GSSAPI MONGODB-CR MONGODB-X509，默认为MONGODB-CR
 				//String database,String userName,String password,String mechanism
 				//https://www.iteye.com/blog/yin-bp-2064662

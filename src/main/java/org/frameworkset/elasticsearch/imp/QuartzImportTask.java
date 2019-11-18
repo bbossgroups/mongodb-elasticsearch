@@ -15,9 +15,9 @@ package org.frameworkset.elasticsearch.imp;
  * limitations under the License.
  */
 
-import org.frameworkset.elasticsearch.client.mongodb2es.MongoDB2ESExportBuilder;
 import org.frameworkset.elasticsearch.client.schedule.ExternalScheduler;
 import org.frameworkset.elasticsearch.client.schedule.quartz.AbstractDB2ESQuartzJobHandler;
+import org.frameworkset.tran.mongodb.input.es.MongoDB2ESExportBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -15,11 +15,9 @@ package org.frameworkset.elasticsearch.imp;
  * limitations under the License.
  */
 
-import org.frameworkset.elasticsearch.client.mongodb2es.MongoDB2ESExportBuilder;
 import org.frameworkset.elasticsearch.client.schedule.ExternalScheduler;
 import org.frameworkset.elasticsearch.client.schedule.quartz.AbstractDB2ESQuartzJobHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.frameworkset.tran.mongodb.input.es.MongoDB2ESExportBuilder;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,7 +32,7 @@ import java.util.Date;
  * @version 1.0
  */
 public class QuartzTimestampImportTask extends AbstractDB2ESQuartzJobHandler {
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	public void init(){
 		externalScheduler = new ExternalScheduler();
 		externalScheduler.dataStream((Object params)->{
