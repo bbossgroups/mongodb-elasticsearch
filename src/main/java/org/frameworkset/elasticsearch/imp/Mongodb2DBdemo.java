@@ -15,6 +15,7 @@ package org.frameworkset.elasticsearch.imp;
  * limitations under the License.
  */
 
+import com.frameworkset.util.SimpleStringUtil;
 import com.mongodb.BasicDBObject;
 import org.frameworkset.elasticsearch.client.DataRefactor;
 import org.frameworkset.elasticsearch.client.DataStream;
@@ -54,7 +55,7 @@ public class Mongodb2DBdemo {
 	public void scheduleTimestampImportData( ){
 		MongoDB2DBExportBuilder importBuilder = MongoDB2DBExportBuilder.newInstance();
 		//导入数据库和sql配置，数据库相关的配置已经在application.properties文件中配置，这里只需要指定sql配置文件和sqlName即可
-		importBuilder.setSqlName("insertSQLnew") //指定将es文档数据同步到数据库的sql语句名称，配置在dsl2ndSqlFile.xml中
+		importBuilder.setSqlName("insertSQLnew") //指定将mongodb文档数据同步到数据库的sql语句名称，配置在sqlFile.xml中
 					 .setSqlFilepath("sqlFile.xml");
 		//mongodb的相关配置参数
 
@@ -91,6 +92,7 @@ public class Mongodb2DBdemo {
 			e.printStackTrace();
 		}
 
+		// 设置按照host字段值进行正则匹配查找数据
 		String host = "169.254.252.194-DESKTOP-U3V5C85";
 		Pattern hosts = Pattern.compile("^" + host + ".*$",
 				Pattern.CASE_INSENSITIVE);
@@ -154,8 +156,14 @@ public class Mongodb2DBdemo {
 		fetchFields.put("privateAttr", 1);
 		fetchFields.put("local", 1);
 		importBuilder.setFetchFields(fetchFields);
+
+		// 设置MongoDB检索选项
+//		DBCollectionFindOptions dbCollectionFindOptions = new DBCollectionFindOptions();
+//		dbCollectionFindOptions.maxTime(10000l, TimeUnit.MILLISECONDS);
+//		importBuilder.setDbCollectionFindOptions(dbCollectionFindOptions);
+
+		//全局忽略字段
 //		importBuilder.addIgnoreFieldMapping("remark1");
-//		importBuilder.setSql("select * from td_sm_log ");
 		/**
 		 * 获取数据
 		 */
@@ -268,20 +276,22 @@ public class Mongodb2DBdemo {
 
 		importBuilder.setDebugResponse(false);//设置是否将每次处理的reponse打印到日志文件中，默认false
 		importBuilder.setDiscardBulkResponse(false);//设置是否需要批量处理的响应报文，不需要设置为false，true为需要，默认false
-		importBuilder.setExportResultHandler(new ExportResultHandler<String,String>() {
+		importBuilder.setExportResultHandler(new ExportResultHandler<Object,Object>() {
 			@Override
-			public void success(TaskCommand<String,String> taskCommand, String result) {
+			public void success(TaskCommand<Object,Object> taskCommand, Object result) {
 				System.out.println(result);
+				System.out.println(SimpleStringUtil.object2json(taskCommand.getTaskMetrics()));
 			}
 
 			@Override
-			public void error(TaskCommand<String,String> taskCommand, String result) {
+			public void error(TaskCommand<Object,Object> taskCommand, Object result) {
 				System.out.println(result);
+				System.out.println(SimpleStringUtil.object2json(taskCommand.getTaskMetrics()));
 			}
 
 			@Override
-			public void exception(TaskCommand<String,String> taskCommand, Exception exception) {
-
+			public void exception(TaskCommand<Object,Object> taskCommand, Exception exception) {
+				System.out.println(SimpleStringUtil.object2json(taskCommand.getTaskMetrics()));
 			}
 
 			@Override
