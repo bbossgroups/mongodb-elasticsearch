@@ -16,12 +16,12 @@ package org.frameworkset.elasticsearch.imp;
  */
 
 import org.frameworkset.elasticsearch.ElasticSearchHelper;
-import org.frameworkset.elasticsearch.client.DataRefactor;
-import org.frameworkset.elasticsearch.client.DataStream;
-import org.frameworkset.elasticsearch.client.ExportResultHandler;
-import org.frameworkset.elasticsearch.client.context.Context;
-import org.frameworkset.elasticsearch.client.task.TaskCommand;
+import org.frameworkset.tran.DataRefactor;
+import org.frameworkset.tran.DataStream;
+import org.frameworkset.tran.ExportResultHandler;
+import org.frameworkset.tran.context.Context;
 import org.frameworkset.tran.mongodb.input.es.MongoDB2ESExportBuilder;
+import org.frameworkset.tran.task.TaskCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -209,17 +209,17 @@ public class Mongodb2ESdemo {
 		importBuilder.setExportResultHandler(new ExportResultHandler<String,String>() {
 			@Override
 			public void success(TaskCommand<String,String> taskCommand, String result) {
-				System.out.println(result);
+				System.out.println(taskCommand.getTaskMetrics());
 			}
 
 			@Override
 			public void error(TaskCommand<String,String> taskCommand, String result) {
-				System.out.println(result);
+				System.out.println(taskCommand.getTaskMetrics());
 			}
 
 			@Override
 			public void exception(TaskCommand<String,String> taskCommand, Exception exception) {
-
+				System.out.println(taskCommand.getTaskMetrics());
 			}
 
 			@Override

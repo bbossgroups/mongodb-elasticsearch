@@ -17,12 +17,12 @@ package org.frameworkset.elasticsearch.imp;
 
 import com.frameworkset.util.SimpleStringUtil;
 import com.mongodb.BasicDBObject;
-import org.frameworkset.elasticsearch.client.DataRefactor;
-import org.frameworkset.elasticsearch.client.DataStream;
-import org.frameworkset.elasticsearch.client.ExportResultHandler;
-import org.frameworkset.elasticsearch.client.context.Context;
-import org.frameworkset.elasticsearch.client.task.TaskCommand;
+import org.frameworkset.tran.DataRefactor;
+import org.frameworkset.tran.DataStream;
+import org.frameworkset.tran.ExportResultHandler;
+import org.frameworkset.tran.context.Context;
 import org.frameworkset.tran.mongodb.input.db.MongoDB2DBExportBuilder;
+import org.frameworkset.tran.task.TaskCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -280,18 +280,18 @@ public class Mongodb2DBdemo {
 			@Override
 			public void success(TaskCommand<Object,Object> taskCommand, Object result) {
 				System.out.println(result);
-				System.out.println(SimpleStringUtil.object2json(taskCommand.getTaskMetrics()));
+				System.out.println(taskCommand.getTaskMetrics());
 			}
 
 			@Override
 			public void error(TaskCommand<Object,Object> taskCommand, Object result) {
 				System.out.println(result);
-				System.out.println(SimpleStringUtil.object2json(taskCommand.getTaskMetrics()));
+				System.out.println(taskCommand.getTaskMetrics());
 			}
 
 			@Override
 			public void exception(TaskCommand<Object,Object> taskCommand, Exception exception) {
-				System.out.println(SimpleStringUtil.object2json(taskCommand.getTaskMetrics()));
+				System.out.println(taskCommand.getTaskMetrics());
 			}
 
 			@Override
