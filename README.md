@@ -13,6 +13,7 @@ Spring booter 1.x,2.x,+
 
 支持的数据库：
 mongodb 到elasticsearch数据同步
+mongodb 到数据库数据同步
 
 支持的Elasticsearch版本：
 1.x,2.x,5.x,6.x,7.x,+
