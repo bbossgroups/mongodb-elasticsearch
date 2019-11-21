@@ -27,7 +27,7 @@ mongodb 到elasticsearch数据同步
 <dependency>
   <groupId>com.bbossgroups.plugins</groupId>
   <artifactId>bboss-elasticsearch-rest-mongodb</artifactId>
-  <version>5.9.2</version>
+  <version>5.9.3</version>
   <scope>compile</scope>
 </dependency>
 ```
@@ -91,35 +91,13 @@ windows: restart.bat
 
 -Xmx1g
 
-## 在工程中添加多个表同步作业
-默认的作业任务是Dbdemo，同步表td_sm_log的数据到索引dbdemo/dbdemo中
 
-现在我们在工程中添加另外一张表td_cms_document的同步到索引cms_document/cms_document的作业步骤：
-
-1.首先，新建一个带main方法的类org.frameworkset.elasticsearch.imp.CMSDocumentImport,实现同步的逻辑
-
-如果需要测试调试，添加main方法,然后debug即可
-
-2.然后，在runfiles目录下新建CMSDocumentImport作业主程序和作业进程配置文件：runfiles/config-cmsdocmenttable.properties，内容如下：
-
-mainclass=org.frameworkset.elasticsearch.imp.CMSDocumentImport
-
-pidfile=CMSDocumentImport.pid  
-
-
-3.最后在runfiles目录下新建作业启动sh文件（这里只新建linux/unix指令，windows的类似）：runfiles/restart-cmsdocumenttable.sh
-
-内容与默认的作业任务是Dbdemo内容一样，只是在java命令后面多加了一个参数，用来指定作业配置文件：--conf=config-cmsdocmenttable.properties
-
-nohup java \$RT_JAVA_OPTS -jar ${project}-${bboss_version}.jar restart --conf=config-cmsdocmenttable.properties --shutdownLevel=9 > ${project}.log &
-
-其他stop shell指令也类似建立即可
 
  
 
 # 作业参数配置
 
-在使用[db-elasticsearch-tool](https://github.com/bbossgroups/db-elasticsearch-tool)时，为了避免调试过程中不断打包发布数据同步工具，可以将部分控制参数配置到启动配置文件resources/application.properties中,然后在代码中通过以下方法获取配置的参数：
+在使用[mongodb-elasticsearch](https://github.com/bbossgroups/mongodb-elasticsearch)时，为了避免调试过程中不断打包发布数据同步工具，可以将部分控制参数配置到启动配置文件resources/application.properties中,然后在代码中通过以下方法获取配置的参数：
 
 ```ini
 #工具主程序
