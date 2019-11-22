@@ -17,6 +17,7 @@ package org.frameworkset.elasticsearch.imp;
 
 import com.mongodb.DBObject;
 import org.frameworkset.elasticsearch.ElasticSearchHelper;
+import org.frameworkset.spi.geoip.IpInfo;
 import org.frameworkset.tran.DataRefactor;
 import org.frameworkset.tran.DataStream;
 import org.frameworkset.tran.ExportResultHandler;
@@ -216,6 +217,14 @@ public class Mongodb2ESdemo {
 				//将long类型的creationTime字段转换为日期类型
 				long creationTime = context.getLongValue("creationTime");
 				context.addFieldValue("creationTime",new Date(creationTime));
+				//根据session访问客户端ip，获取对应的客户地理位置经纬度信息、运营商信息、省地市信息IpInfo对象
+				//并将IpInfo添加到Elasticsearch文档中
+				String referip = context.getStringValue("referip");
+				if(referip != null){
+					IpInfo ipInfo = context.getIpInfoByIp(referip);
+					if(ipInfo != null)
+						context.addFieldValue("ipInfo",ipInfo);
+				}
 				 //除了通过context接口获取mongodb的记录字段，还可以直接获取当前的mongodb记录，可自行利用里面的值进行相关处理
 				DBObject record = (DBObject) context.getRecord();
 				//上述三个属性已经放置到docInfo中，如果无需再放置到索引文档中，可以忽略掉这些属性
