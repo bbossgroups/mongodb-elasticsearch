@@ -17,6 +17,7 @@ package org.frameworkset.elasticsearch.imp;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.xxl.job.core.util.ShardingUtil;
 import org.frameworkset.elasticsearch.imp.session.TestVO;
 import org.frameworkset.soa.ObjectSerializable;
 import org.frameworkset.spi.geoip.IpInfo;
@@ -25,7 +26,7 @@ import org.frameworkset.tran.ExportResultHandler;
 import org.frameworkset.tran.context.Context;
 import org.frameworkset.tran.mongodb.input.es.MongoDB2ESExportBuilder;
 import org.frameworkset.tran.schedule.ExternalScheduler;
-import org.frameworkset.tran.schedule.quartz.AbstractDB2ESQuartzJobHandler;
+import org.frameworkset.tran.schedule.xxjob.AbstractXXLJobHandler;
 import org.frameworkset.tran.task.TaskCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * <p>Description: 使用quartz等外部环境定时运行导入数据，需要设置：</p>
+ * <p>Description: 使用xxl-job,quartz等外部定时任务调度引擎导入数据，需要设置：</p>
  * importBuilder.setExternalTimer(true);
  * <p></p>
  * <p>Copyright (c) 2018</p>
@@ -42,11 +43,15 @@ import java.util.Date;
  * @author biaoping.yin
  * @version 1.0
  */
-public class QuartzImportTask extends AbstractDB2ESQuartzJobHandler {
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
+public class XXJobMongodb2ESImportTask extends AbstractXXLJobHandler {
+	private static Logger logger = LoggerFactory.getLogger(XXJobMongodb2ESImportTask.class);
 	public void init(){
+		// 可参考Sample示例执行器中的示例任务"ShardingJobHandler"了解试用
+
 		externalScheduler = new ExternalScheduler();
 		externalScheduler.dataStream((Object params)->{
+
+			logger.info("params:>>>>>>>>>>>>>>>>>>>" + params);
 			// 5.2.4 编写同步代码
 			//定义Mongodb到Elasticsearch数据同步组件
 			MongoDB2ESExportBuilder importBuilder = MongoDB2ESExportBuilder.newInstance();
@@ -72,6 +77,23 @@ public class QuartzImportTask extends AbstractDB2ESQuartzJobHandler {
 
 			//定义mongodb数据查询条件对象（可选步骤，全量同步可以不需要做条件配置）
 			BasicDBObject query = new BasicDBObject();
+
+			// 提取集群节点分片号，将分片号作为检索同步数据的条件,实现分片同步功能
+			ShardingUtil.ShardingVO shardingVO = ShardingUtil.getShardingVo();
+			int index = 0;
+			if(shardingVO != null) {
+				index = shardingVO.getIndex();
+				logger.info("index:>>>>>>>>>>>>>>>>>>>" + shardingVO.getIndex());
+				logger.info("total:>>>>>>>>>>>>>>>>>>>" + shardingVO.getTotal());
+			}
+			try {
+				String idxStr = ObjectSerializable.toXML(index);
+				query.append("shardNo",idxStr );
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+
 			// 设定检索mongdodb session数据时间范围条件
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 			try {
@@ -118,19 +140,13 @@ public class QuartzImportTask extends AbstractDB2ESQuartzJobHandler {
 			// 5.2.4.3 导入elasticsearch参数配置
 			importBuilder
 					.setIndex("mongodbdemo") //必填项，索引名称
-					.setIndexType("mongodbdemo") //es 7以后的版本不需要设置indexType，es7以前的版本必需设置indexType
+					.setIndexType("mongodbdemo") //es 7以后的版本不需要设置indexType或者设置为_doc，es7以前的版本必需设置indexType
 //				.setRefreshOption("refresh")//可选项，null表示不实时刷新，importBuilder.setRefreshOption("refresh");表示实时刷新
 					.setPrintTaskLog(true) //可选项，true 打印任务执行日志（耗时，处理记录数） false 不打印，默认值false
 					.setBatchSize(10)  //可选项,批量导入es的记录数，默认为-1，逐条处理，> 0时批量处理
 					.setFetchSize(100)  //按批从mongodb拉取数据的大小
 					.setEsIdField("_id")//设置文档主键，不设置，则自动产生文档id,直接将mongodb的ObjectId设置为Elasticsearch的文档_id
 					.setContinueOnError(true); // 忽略任务执行异常，任务执行过程抛出异常不中断任务执行
-
-			// 5.2.4.4 jdk timer定时任务时间配置（可选步骤，可以不需要做以下配置）
-			importBuilder.setFixedRate(false)//参考jdk timer task文档对fixedRate的说明
-//					 .setScheduleDate(date) //指定任务开始执行时间：日期
-					.setDeyLay(1000L) // 任务延迟执行deylay毫秒后执行
-					.setPeriod(5000L); //每隔period毫秒执行，如果不设置，只执行一次
 
 			// 5.2.4.5 并行任务配置（可选步骤，可以不需要做以下配置）
 			importBuilder.setParallel(true);//设置为多线程并行批量导入,false串行
@@ -140,8 +156,8 @@ public class QuartzImportTask extends AbstractDB2ESQuartzJobHandler {
 			importBuilder.setAsyn(false);//是否同步等待每批次任务执行完成后再返回调度程序，true 不等待所有导入作业任务结束，方法快速返回；false（默认值） 等待所有导入作业任务结束，所有作业结束后方法才返回
 
 			// 5.2.4.6 数据加工处理（可选步骤，可以不需要做以下配置）
-			// 全局记录配置：打tag，标识数据来源于jdk timer
-			importBuilder.addFieldValue("fromTag","jdk timer");
+			// 全局记录配置：打tag，标识数据来源于xxljob
+			 importBuilder.addFieldValue("fromTag","xxljob");
 			// 数据记录级别的转换处理（可选步骤，可以不需要做以下配置）
 			importBuilder.setDataRefactor(new DataRefactor() {
 				public void refactor(Context context) throws Exception  {
@@ -157,7 +173,6 @@ public class QuartzImportTask extends AbstractDB2ESQuartzJobHandler {
 					boolean secure = context.getBooleanValue("secure");
 					String shardNo = context.getStringValue("shardNo");
 					if(shardNo != null){
-						//利用xml序列化组件将xml报文序列化为一个Integer
 						context.addFieldValue("shardNo", ObjectSerializable.toBean(shardNo,Integer.class));
 					}
 					else{
@@ -168,7 +183,6 @@ public class QuartzImportTask extends AbstractDB2ESQuartzJobHandler {
 					if(userAccount == null)
 						context.addFieldValue("userAccount","");
 					else{
-						//利用xml序列化组件将xml报文序列化为一个String
 						context.addFieldValue("userAccount", ObjectSerializable.toBean(userAccount,String.class));
 					}
 					//空值处理
@@ -176,9 +190,7 @@ public class QuartzImportTask extends AbstractDB2ESQuartzJobHandler {
 					if(testVO == null)
 						context.addFieldValue("testVO","");
 					else{
-						//利用xml序列化组件将xml报文序列化为一个TestVO
-						TestVO testVO1 = ObjectSerializable.toBean(userAccount, TestVO.class);
-						context.addFieldValue("testVO", testVO1);
+						context.addFieldValue("testVO", ObjectSerializable.toBean(userAccount, TestVO.class));
 					}
 					//空值处理
 					String privateAttr = context.getStringValue("privateAttr");
@@ -186,7 +198,6 @@ public class QuartzImportTask extends AbstractDB2ESQuartzJobHandler {
 						context.addFieldValue("privateAttr", "");
 					}
 					else{
-						//利用xml序列化组件将xml报文序列化为一个String
 						context.addFieldValue("privateAttr", ObjectSerializable.toBean(privateAttr, String.class));
 					}
 					//空值处理
@@ -194,7 +205,6 @@ public class QuartzImportTask extends AbstractDB2ESQuartzJobHandler {
 					if(local == null)
 						context.addFieldValue("local","");
 					else{
-						//利用xml序列化组件将xml报文序列化为一个String
 						context.addFieldValue("local", ObjectSerializable.toBean(local, String.class));
 					}
 					//将long类型的lastAccessedTime字段转换为日期类型
@@ -247,25 +257,10 @@ public class QuartzImportTask extends AbstractDB2ESQuartzJobHandler {
 				}
 			});
 
-			/**
-			 // 5.2.4.8 自定义Elasticsearch索引文档id生成机制（可选步骤，可以不需要做以下配置）
-			 //自定义Elasticsearch索引文档id生成机制
-			 importBuilder.setEsIdGenerator(new EsIdGenerator() {
-			 //如果指定EsIdGenerator，则根据下面的方法生成文档id，
-			 // 否则根据setEsIdField方法设置的字段值作为文档id，
-			 // 如果默认没有配置EsIdField和如果指定EsIdGenerator，则由es自动生成文档id
-
-			 @Override
-			 public Object genId(Context context) throws Exception {
-			 return SimpleStringUtil.getUUID();//返回null，则由es自动生成文档id
-			 }
-			 });*/
-
 			// 5.2.4.9 设置增量字段信息（可选步骤，全量同步不需要做以下配置）
 			//增量配置开始
 			importBuilder.setNumberLastValueColumn("lastAccessedTime");//手动指定数字增量查询字段
-			importBuilder.setFromFirst(true);//任务重启时，重新开始采集数据，true 重新开始，false不重新开始，适合于每次全量导入数据的情况，如果是全量导入，可以先删除原来的索引数据
-			importBuilder.setLastValueStorePath("mongodb_import");//记录上次采集的增量字段值的文件路径，作为下次增量（或者重启后）采集数据的起点，不同的任务这个路径要不一样
+			importBuilder.setFromFirst(false);//任务重启时，重新开始采集数据，true 重新开始，false不重新开始，适合于每次全量导入数据的情况，如果是全量导入，可以先删除原来的索引数据
 			//设置增量查询的起始值lastvalue
 			try {
 				Date date = format.parse("2000-01-01");
@@ -274,7 +269,7 @@ public class QuartzImportTask extends AbstractDB2ESQuartzJobHandler {
 			catch (Exception e){
 				e.printStackTrace();
 			}
-
+			// 直接返回importBuilder组件
 			return importBuilder;
 		});
 

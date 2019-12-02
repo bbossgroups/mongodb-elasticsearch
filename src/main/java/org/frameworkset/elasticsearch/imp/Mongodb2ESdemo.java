@@ -104,40 +104,8 @@ public class Mongodb2ESdemo {
 				.setDeyLay(1000L) // 任务延迟执行deylay毫秒后执行
 				.setPeriod(5000L); //每隔period毫秒执行，如果不设置，只执行一次
 		//定时任务配置结束
-//
-//		//设置任务执行拦截器，可以添加多个，定时任务每次执行的拦截器
-//		importBuilder.addCallInterceptor(new CallInterceptor() {
-//			@Override
-//			public void preCall(TaskContext taskContext) {
-//				System.out.println("preCall");
-//			}
-//
-//			@Override
-//			public void afterCall(TaskContext taskContext) {
-//				System.out.println("afterCall");
-//			}
-//
-//			@Override
-//			public void throwException(TaskContext taskContext, Exception e) {
-//				System.out.println("throwException");
-//			}
-//		}).addCallInterceptor(new CallInterceptor() {
-//			@Override
-//			public void preCall(TaskContext taskContext) {
-//				System.out.println("preCall 1");
-//			}
-//
-//			@Override
-//			public void afterCall(TaskContext taskContext) {
-//				System.out.println("afterCall 1");
-//			}
-//
-//			@Override
-//			public void throwException(TaskContext taskContext, Exception e) {
-//				System.out.println("throwException 1");
-//			}
-//		});
-//		//设置任务执行拦截器结束，可以添加多个
+
+
 		//增量配置开始
 		importBuilder.setNumberLastValueColumn("lastAccessedTime");//手动指定数字增量查询字段
 //		importBuilder.setDateLastValueColumn("log_id");//手动指定日期增量查询字段
@@ -179,6 +147,7 @@ public class Mongodb2ESdemo {
 //		testObject.setId("testid");
 //		testObject.setName("jackson");
 //		importBuilder.addFieldValue("testObject",testObject);
+//		importBuilder.addIgnoreFieldMapping("testInt");
 //
 //		/**
 //		 * 重新设置es数据结构
@@ -225,12 +194,18 @@ public class Mongodb2ESdemo {
 					if(ipInfo != null)
 						context.addFieldValue("ipInfo",ipInfo);
 				}
+				/**
+				String oldValue = context.getStringValue("axx");
+				String newvalue = oldValue+" new value";
+				context.newName2ndData("axx","newname",newvalue);
+				 */
 				 //除了通过context接口获取mongodb的记录字段，还可以直接获取当前的mongodb记录，可自行利用里面的值进行相关处理
 				DBObject record = (DBObject) context.getRecord();
 				//上述三个属性已经放置到docInfo中，如果无需再放置到索引文档中，可以忽略掉这些属性
 //				context.addIgnoreFieldMapping("author");
 //				context.addIgnoreFieldMapping("title");
 //				context.addIgnoreFieldMapping("subtitle");
+
 			}
 		});
 		//映射和转换配置结束
@@ -259,6 +234,7 @@ public class Mongodb2ESdemo {
 			@Override
 			public void error(TaskCommand<Object,String> taskCommand, String result) {
 				System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
+
 			}
 
 			@Override
@@ -288,7 +264,6 @@ public class Mongodb2ESdemo {
 		 */
 		DataStream dataStream = importBuilder.builder();
 		dataStream.execute();//执行同步操作
-
 		System.out.println();
 	}
 
