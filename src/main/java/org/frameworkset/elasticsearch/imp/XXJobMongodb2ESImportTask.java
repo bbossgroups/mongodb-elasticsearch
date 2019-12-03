@@ -18,7 +18,7 @@ package org.frameworkset.elasticsearch.imp;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.xxl.job.core.util.ShardingUtil;
-import org.frameworkset.elasticsearch.imp.session.TestVO;
+import org.frameworkset.session.TestVO;
 import org.frameworkset.soa.ObjectSerializable;
 import org.frameworkset.spi.geoip.IpInfo;
 import org.frameworkset.tran.DataRefactor;
@@ -112,7 +112,7 @@ public class XXJobMongodb2ESImportTask extends AbstractXXLJobHandler {
 			 Pattern hosts = Pattern.compile("^" + host + ".*$",
 			 Pattern.CASE_INSENSITIVE);
 			 query.append("host", new BasicDBObject("$regex",hosts));*/
-			//importBuilder.setQuery(query);
+			importBuilder.setQuery(query);
 
 			//设定需要返回的session数据字段信息（可选步骤，同步全部字段时可以不需要做下面配置）
 			BasicDBObject fetchFields = new BasicDBObject();
@@ -190,7 +190,7 @@ public class XXJobMongodb2ESImportTask extends AbstractXXLJobHandler {
 					if(testVO == null)
 						context.addFieldValue("testVO","");
 					else{
-						context.addFieldValue("testVO", ObjectSerializable.toBean(userAccount, TestVO.class));
+						context.addFieldValue("testVO", ObjectSerializable.toBean(testVO, TestVO.class));
 					}
 					//空值处理
 					String privateAttr = context.getStringValue("privateAttr");
@@ -232,11 +232,14 @@ public class XXJobMongodb2ESImportTask extends AbstractXXLJobHandler {
 				@Override
 				public void success(TaskCommand<Object,String> taskCommand, String result) {
 					System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
+
+
 				}
 
 				@Override
 				public void error(TaskCommand<Object,String> taskCommand, String result) {
 					System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
+					System.out.println(result);
 					/**
 					 //分析result，提取错误数据修改后重新执行,
 					 Object datas = taskCommand.getDatas();
@@ -249,6 +252,7 @@ public class XXJobMongodb2ESImportTask extends AbstractXXLJobHandler {
 				@Override
 				public void exception(TaskCommand<Object,String> taskCommand, Exception exception) {
 					System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
+					logger.error("",exception);
 				}
 
 				@Override

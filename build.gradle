@@ -150,7 +150,7 @@ configure(allprojects) { project ->
 		compile (
 				[group: 'com.bbossgroups', name: 'bboss-rt', version: "${bboss_version}", transitive: false],
 		)
-		compile 'com.xuxueli:xxl-job-core:2.0.2'
+		compile 'com.xuxueli:xxl-job-core:2.1.1'
 
 	}
 

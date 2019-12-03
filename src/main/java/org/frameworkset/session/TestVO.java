@@ -1,4 +1,4 @@
-package org.frameworkset.elasticsearch.imp.session;
+package org.frameworkset.session;
 
 public class TestVO implements java.io.Serializable{
 	private String id;

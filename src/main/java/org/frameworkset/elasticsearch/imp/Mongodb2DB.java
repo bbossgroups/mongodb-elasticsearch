@@ -19,8 +19,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.frameworkset.elasticsearch.ElasticSearchHelper;
 import org.frameworkset.elasticsearch.client.ClientInterface;
-import org.frameworkset.elasticsearch.imp.session.TestVO;
 import org.frameworkset.runtime.CommonLauncher;
+import org.frameworkset.session.TestVO;
 import org.frameworkset.soa.ObjectSerializable;
 import org.frameworkset.spi.geoip.IpInfo;
 import org.frameworkset.tran.DataRefactor;
@@ -126,7 +126,7 @@ public class Mongodb2DB {
 		Pattern hosts = Pattern.compile("^" + host + ".*$",
 				Pattern.CASE_INSENSITIVE);
 		query.append("host", new BasicDBObject("$regex",hosts));*/
-		//importBuilder.setQuery(query);
+		importBuilder.setQuery(query);
 
 		//设定需要返回的session数据字段信息（可选步骤，同步全部字段时可以不需要做下面配置）
 		BasicDBObject fetchFields = new BasicDBObject();
@@ -213,7 +213,7 @@ public class Mongodb2DB {
 					context.addFieldValue("testVO","");
 				else{
 					//利用xml序列化组件将xml报文序列化为一个TestVO
-					TestVO testVO1 = ObjectSerializable.toBean(userAccount, TestVO.class);
+					TestVO testVO1 = ObjectSerializable.toBean(testVO, TestVO.class);
 					context.addFieldValue("testVO", testVO1);
 				}
 				//空值处理
