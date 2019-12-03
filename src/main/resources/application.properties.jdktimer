@@ -1,5 +1,5 @@
 # mongodb-elasticsearch jdk timer调度工具主程序
-mainclass=org.frameworkset.elasticsearch.imp.Mongodb2DB
+mainclass=org.frameworkset.elasticsearch.imp.Mongodb2ES
 
 # Elasticsearch配置
 ##x-pack或者searchguard账号和口令

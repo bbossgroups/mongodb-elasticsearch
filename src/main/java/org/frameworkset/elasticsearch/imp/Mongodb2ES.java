@@ -41,14 +41,14 @@ import java.util.Date;
  * @author biaoping.yin
  * @version 1.0
  */
-public class Mongodb2DB {
+public class Mongodb2ES {
 	/**
 	 * 启动运行同步作业主方法
 	 * @param args
 	 */
 	public static void main(String[] args){
 
-		Mongodb2DB dbdemo = new Mongodb2DB();
+		Mongodb2ES dbdemo = new Mongodb2ES();
 		dbdemo.scheduleImportData();
 	}
 
