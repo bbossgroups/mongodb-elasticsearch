@@ -263,7 +263,7 @@ public class XXJobMongodb2ESImportTask extends AbstractXXLJobHandler {
 
 			// 5.2.4.9 设置增量字段信息（可选步骤，全量同步不需要做以下配置）
 			//增量配置开始
-			importBuilder.setNumberLastValueColumn("lastAccessedTime");//手动指定数字增量查询字段
+			importBuilder.setLastValueColumn("lastAccessedTime");//手动指定数字增量查询字段
 			importBuilder.setFromFirst(false);//任务重启时，重新开始采集数据，true 重新开始，false不重新开始，适合于每次全量导入数据的情况，如果是全量导入，可以先删除原来的索引数据
 			//设置增量查询的起始值lastvalue
 			try {
