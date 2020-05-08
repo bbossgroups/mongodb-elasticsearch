@@ -86,7 +86,8 @@ public class Mongodb2ES {
 		// 5.2.4 编写同步代码
 		//定义Mongodb到Elasticsearch数据同步组件
 		MongoDB2ESExportBuilder importBuilder = MongoDB2ESExportBuilder.newInstance();
-
+//		importBuilder.setStatusDbname("statusds");
+//		importBuilder.setStatusTableDML(DBConfig.mysql_createStatusTableSQL);
 		// 5.2.4.1 设置mongodb参数
 		importBuilder.setName("session")
 				.setDb("sessiondb")
