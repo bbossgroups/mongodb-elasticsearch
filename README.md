@@ -28,7 +28,7 @@ mongodb 到数据库数据同步
 <dependency>
   <groupId>com.bbossgroups.plugins</groupId>
   <artifactId>bboss-elasticsearch-rest-mongodb</artifactId>
-  <version>6.2.2</version>
+  <version>6.2.3</version>
   <scope>compile</scope>
 </dependency>
 ```
@@ -51,7 +51,7 @@ org.frameworkset.elasticsearch.imp.Mongodb2ESdemo
 
 ```java
 public class Dbdemo {
-	public static void main(String args[]){
+	public static void main(String[] args){
 
 		Mongodb2ESdemo dbdemo = new Mongodb2ESdemo();
         		boolean dropIndice = true;//CommonLauncher.getBooleanAttribute("dropIndice",false);//同时指定了默认值
