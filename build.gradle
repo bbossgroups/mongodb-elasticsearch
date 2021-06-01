@@ -152,6 +152,30 @@ configure(allprojects) { project ->
 		)
 		api 'com.xuxueli:xxl-job-core:2.1.1'
 
+		api(
+				[group: 'com.bbossgroups.plugins', name: 'bboss-elasticsearch-rest-kafka2x', version: "${bboss_es_version}", transitive: true],
+		)
+		api (
+				[group: 'org.apache.kafka', name: 'kafka_2.12', version: "${kafka2x}", transitive: true],
+		){
+			exclude group: 'log4j', module: 'log4j'
+			exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+		}
+
+		api ([group: 'org.apache.kafka', name: 'kafka-tools', version: "${kafka2x}", transitive: true],){
+			exclude group: 'log4j', module: 'log4j'
+			exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+		}
+
+		api ([group: 'org.apache.kafka', name: 'kafka-clients', version: "${kafka2x}", transitive: true],){
+			exclude group: 'log4j', module: 'log4j'
+			exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+		}
+
+		api ([group: 'org.apache.kafka', name: 'kafka-streams', version: "${kafka2x}", transitive: true],){
+			exclude group: 'log4j', module: 'log4j'
+			exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+		}
 	}
 
 
