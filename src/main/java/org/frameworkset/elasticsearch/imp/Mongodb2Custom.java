@@ -15,6 +15,7 @@ package org.frameworkset.elasticsearch.imp;
  * limitations under the License.
  */
 
+import com.frameworkset.util.SimpleStringUtil;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.frameworkset.session.TestVO;
@@ -29,6 +30,8 @@ import org.frameworkset.tran.mongodb.input.dummy.Mongodb2DummyExportBuilder;
 import org.frameworkset.tran.ouput.custom.CustomOutPut;
 import org.frameworkset.tran.schedule.TaskContext;
 import org.frameworkset.tran.task.TaskCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -44,6 +47,7 @@ import java.util.Map;
  * @version 1.0
  */
 public class Mongodb2Custom {
+	private static Logger logger = LoggerFactory.getLogger(Mongodb2Dummy.class);
 	/**
 	 * 启动运行同步作业主方法
 	 * @param args
@@ -138,6 +142,7 @@ public class Mongodb2Custom {
 				for(CommonRecord record:datas){
 					Map<String,Object> data = record.getDatas();
 					//自行处理data数据，写hbase，clickhouse，hdfs，以及其他数据库
+					logger.info(SimpleStringUtil.object2json(data));
 				}
 			}
 		});
