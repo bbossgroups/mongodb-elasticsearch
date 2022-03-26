@@ -3,7 +3,7 @@ Bboss is a good elasticsearch Java rest client. It operates and accesses elastic
 
 # BBoss Environmental requirements
 
-JDK requirement: JDK 1.7+
+JDK requirement: JDK 1.8+
 
 Elasticsearch version requirements: 1.x,2.X,5.X,6.X,8.x,+
 
@@ -28,7 +28,7 @@ mongodb 到数据库数据同步
 <dependency>
   <groupId>com.bbossgroups.plugins</groupId>
   <artifactId>bboss-elasticsearch-rest-mongodb</artifactId>
-  <version>6.5.2</version>
+  <version>6.5.3</version>
   <scope>compile</scope>
 </dependency>
 ```
