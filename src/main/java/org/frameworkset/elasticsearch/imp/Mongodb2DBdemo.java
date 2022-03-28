@@ -15,13 +15,14 @@ package org.frameworkset.elasticsearch.imp;
  * limitations under the License.
  */
 
-import com.frameworkset.util.SimpleStringUtil;
 import com.mongodb.BasicDBObject;
 import org.frameworkset.tran.DataRefactor;
 import org.frameworkset.tran.DataStream;
 import org.frameworkset.tran.ExportResultHandler;
 import org.frameworkset.tran.context.Context;
 import org.frameworkset.tran.mongodb.input.db.MongoDB2DBExportBuilder;
+import org.frameworkset.tran.schedule.CallInterceptor;
+import org.frameworkset.tran.schedule.TaskContext;
 import org.frameworkset.tran.task.TaskCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -181,7 +182,7 @@ public class Mongodb2DBdemo {
 		//增量配置开始
 		importBuilder.setLastValueColumn("creationTime");//手动指定数字增量查询字段
 		importBuilder.setFromFirst(true);//任务重启时，重新开始采集数据，true 重新开始，false不重新开始，适合于每次全量导入数据的情况，如果是全量导入，可以先删除原来的索引数据
-		importBuilder.setLastValueStorePath("mongodb_import");//记录上次采集的增量字段值的文件路径，作为下次增量（或者重启后）采集数据的起点，不同的任务这个路径要不一样
+		importBuilder.setLastValueStorePath("mongodbdb_import");//记录上次采集的增量字段值的文件路径，作为下次增量（或者重启后）采集数据的起点，不同的任务这个路径要不一样
 //		importBuilder.setLastValueStoreTableName("logs");//记录上次采集的增量字段值的表，可以不指定，采用默认表名increament_tab
 //		importBuilder.setLastValueType(ImportIncreamentConfig.TIMESTAMP_TYPE);//指定字段类型：ImportIncreamentConfig.NUMBER_TYPE 数字类型,ImportIncreamentConfig.TIMESTAMP_TYPE为时间类型
 		//设置增量起始值，long类型时间值
@@ -275,27 +276,43 @@ public class Mongodb2DBdemo {
 
 		importBuilder.setDebugResponse(false);//设置是否将每次处理的reponse打印到日志文件中，默认false
 		importBuilder.setDiscardBulkResponse(false);//设置是否需要批量处理的响应报文，不需要设置为false，true为需要，默认false
-		importBuilder.setExportResultHandler(new ExportResultHandler<Object,Object>() {
+//设置任务处理结果回调接口
+		importBuilder.setExportResultHandler(new ExportResultHandler<Object,String>() {
 			@Override
-			public void success(TaskCommand<Object,Object> taskCommand, Object result) {
-				System.out.println(result);
-				System.out.println(taskCommand.getTaskMetrics());
+			public void success(TaskCommand<Object,String> taskCommand, String result) {
+				logger.info(taskCommand.getTaskMetrics().toString());//打印任务执行情况
 			}
 
 			@Override
-			public void error(TaskCommand<Object,Object> taskCommand, Object result) {
-				System.out.println(result);
-				System.out.println(taskCommand.getTaskMetrics());
+			public void error(TaskCommand<Object,String> taskCommand, String result) {
+				logger.info(taskCommand.getTaskMetrics().toString());//打印任务执行情况
+
 			}
 
 			@Override
-			public void exception(TaskCommand<Object,Object> taskCommand, Exception exception) {
-				System.out.println(taskCommand.getTaskMetrics());
+			public void exception(TaskCommand<Object,String> taskCommand, Exception exception) {
+				logger.info(taskCommand.getTaskMetrics().toString(),exception);//打印任务执行情况
 			}
 
 			@Override
 			public int getMaxRetry() {
 				return 0;
+			}
+		});
+		importBuilder.addCallInterceptor(new CallInterceptor() {
+			@Override
+			public void preCall(TaskContext taskContext) {
+
+			}
+
+			@Override
+			public void afterCall(TaskContext taskContext) {
+				logger.info(taskContext.getJobTaskMetrics().toString());//打印任务执行情况
+			}
+
+			@Override
+			public void throwException(TaskContext taskContext, Exception e) {
+				logger.info(taskContext.getJobTaskMetrics().toString(),e);//打印任务执行情况
 			}
 		});
 		//

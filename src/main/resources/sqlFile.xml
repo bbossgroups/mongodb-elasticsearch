@@ -174,7 +174,7 @@
         <![CDATA[INSERT INTO mongodb2db (id, userAccount, testVO, privateAttr, referip, requesturi, secure, sessionid,
         host, httpOnly, lastAccessedHostIP, lastAccessedTime, lastAccessedUrl, local, maxInactiveInterval, appKey, creationTime, extfiled,extfiled2)
         VALUES (#[_id], #[userAccount], #[testVO], #[privateAttr], #[referip], #[requesturi], #[secure], #[sessionid],
-        #[host], #[httpOnly], #[lastAccessedHostIP], #[lastAccessedTime], #[lastAccessedUrl], #[local], #[maxInactiveInterval], #[appKey], #[creationTime], #[extfiled],#[extfiled2]);
+        #[host], #[httpOnly], #[lastAccessedHostIP], #[lastAccessedTime], #[lastAccessedUrl], #[local], #[maxInactiveInterval], #[appKey], #[creationTime], #[extfiled],#[extfiled2])
 
 ]]>
     </property>
