@@ -43,3 +43,4 @@ ip.cachesize = 2000
 ip.database = E:/workspace/hnai/terminal/geolite2/GeoLite2-City.mmdb
 ip.asnDatabase = E:/workspace/hnai/terminal/geolite2/GeoLite2-ASN.mmdb
 
+quartzImportTask.crontime = */20 * * * * ?

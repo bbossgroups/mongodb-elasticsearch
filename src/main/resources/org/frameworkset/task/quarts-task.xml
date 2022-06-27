@@ -52,7 +52,7 @@
 					<property name="quartzImportTask" jobid="quartzImportTask"
 							  bean-name="quartzImportTask"
 							  method="execute"
-						cronb_time="${quartzImportTask.crontime}" used="false"
+						cronb_time="${quartzImportTask.crontime}" used="true"
 						shouldRecover="false"
 						/>
 

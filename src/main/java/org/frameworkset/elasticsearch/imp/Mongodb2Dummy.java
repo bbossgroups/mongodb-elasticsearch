@@ -25,9 +25,10 @@ import org.frameworkset.tran.CommonRecord;
 import org.frameworkset.tran.DataRefactor;
 import org.frameworkset.tran.DataStream;
 import org.frameworkset.tran.ExportResultHandler;
+import org.frameworkset.tran.config.ImportBuilder;
 import org.frameworkset.tran.context.Context;
-import org.frameworkset.tran.mongodb.input.dummy.Mongodb2DummyExportBuilder;
-import org.frameworkset.tran.ouput.dummy.DummyOupputConfig;
+import org.frameworkset.tran.plugin.dummy.output.DummyOutputConfig;
+import org.frameworkset.tran.plugin.mongodb.input.MongoDBInputConfig;
 import org.frameworkset.tran.task.TaskCommand;
 import org.frameworkset.tran.util.RecordGenerator;
 
@@ -62,11 +63,12 @@ public class Mongodb2Dummy {
 
 		// 5.2.4 编写同步代码
 		//定义Mongodb到dummy数据同步组件
-		Mongodb2DummyExportBuilder importBuilder = new Mongodb2DummyExportBuilder();
+		ImportBuilder importBuilder = new ImportBuilder();
 //		importBuilder.setStatusDbname("statusds");
 //		importBuilder.setStatusTableDML(DBConfig.mysql_createStatusTableSQL);
 		// 5.2.4.1 设置mongodb参数
-		importBuilder.setName("session")
+		MongoDBInputConfig mongoDBInputConfig = new MongoDBInputConfig();
+		mongoDBInputConfig.setName("session")
 				.setDb("sessiondb")
 				.setDbCollection("sessionmonitor_sessions")
 				.setConnectTimeout(10000)
@@ -104,7 +106,7 @@ public class Mongodb2Dummy {
 		Pattern hosts = Pattern.compile("^" + host + ".*$",
 				Pattern.CASE_INSENSITIVE);
 		query.append("host", new BasicDBObject("$regex",hosts));*/
-		importBuilder.setQuery(query);
+		mongoDBInputConfig.setQuery(query);
 
 		//设定需要返回的session数据字段信息（可选步骤，同步全部字段时可以不需要做下面配置）
 		BasicDBObject fetchFields = new BasicDBObject();
@@ -128,9 +130,10 @@ public class Mongodb2Dummy {
 		fetchFields.put("local", 1);
 		fetchFields.put("shardNo", 1);
 
-		importBuilder.setFetchFields(fetchFields);
+		mongoDBInputConfig.setFetchFields(fetchFields);
+		importBuilder.setInputConfig(mongoDBInputConfig);
 		// 5.2.4.3 导入dummy参数配置
-		DummyOupputConfig dummyOupputConfig = new DummyOupputConfig();
+		DummyOutputConfig dummyOupputConfig = new DummyOutputConfig();
 		dummyOupputConfig.setRecordGenerator(new RecordGenerator() {
 			@Override
 			public void buildRecord(Context taskContext, CommonRecord record, Writer builder) throws Exception{
@@ -138,7 +141,7 @@ public class Mongodb2Dummy {
 
 			}
 		}).setPrintRecord(true);
-		importBuilder.setDummyOupputConfig(dummyOupputConfig);
+		importBuilder.setOutputConfig(dummyOupputConfig);
 		// 5.2.4.4 jdk timer定时任务时间配置（可选步骤，可以不需要做以下配置）
 		importBuilder.setFixedRate(false)//参考jdk timer task文档对fixedRate的说明
 //					 .setScheduleDate(date) //指定任务开始执行时间：日期

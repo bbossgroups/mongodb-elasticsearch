@@ -26,9 +26,10 @@ import org.frameworkset.tran.CommonRecord;
 import org.frameworkset.tran.DataRefactor;
 import org.frameworkset.tran.DataStream;
 import org.frameworkset.tran.ExportResultHandler;
+import org.frameworkset.tran.config.ImportBuilder;
 import org.frameworkset.tran.context.Context;
-import org.frameworkset.tran.kafka.output.KafkaOutputConfig;
-import org.frameworkset.tran.kafka.output.mongodb.Mongodb2KafkaExportBuilder;
+import org.frameworkset.tran.plugin.kafka.output.Kafka2OutputConfig;
+import org.frameworkset.tran.plugin.mongodb.input.MongoDBInputConfig;
 import org.frameworkset.tran.task.TaskCommand;
 import org.frameworkset.tran.util.RecordGenerator;
 
@@ -63,11 +64,12 @@ public class Mongodb2Kafka {
 
 		// 5.2.4 编写同步代码
 		//定义Mongodb到dummy数据同步组件
-		Mongodb2KafkaExportBuilder importBuilder = new Mongodb2KafkaExportBuilder();
+		ImportBuilder importBuilder = new ImportBuilder();
 //		importBuilder.setStatusDbname("statusds");
 //		importBuilder.setStatusTableDML(DBConfig.mysql_createStatusTableSQL);
 		// 5.2.4.1 设置mongodb参数
-		importBuilder.setName("session")
+		MongoDBInputConfig mongoDBInputConfig = new MongoDBInputConfig();
+		mongoDBInputConfig.setName("session")
 				.setDb("sessiondb")
 				.setDbCollection("sessionmonitor_sessions")
 				.setConnectTimeout(10000)
@@ -105,7 +107,7 @@ public class Mongodb2Kafka {
 		Pattern hosts = Pattern.compile("^" + host + ".*$",
 				Pattern.CASE_INSENSITIVE);
 		query.append("host", new BasicDBObject("$regex",hosts));*/
-		importBuilder.setQuery(query);
+		mongoDBInputConfig.setQuery(query);
 
 		//设定需要返回的session数据字段信息（可选步骤，同步全部字段时可以不需要做下面配置）
 		BasicDBObject fetchFields = new BasicDBObject();
@@ -129,15 +131,16 @@ public class Mongodb2Kafka {
 		fetchFields.put("local", 1);
 		fetchFields.put("shardNo", 1);
 
-		importBuilder.setFetchFields(fetchFields);
+		mongoDBInputConfig.setFetchFields(fetchFields);
+		importBuilder.setInputConfig(mongoDBInputConfig);
 		// 5.2.4.3  kafka输出服务器参数配置
 		// kafka 2x 客户端参数项及说明类：org.apache.kafka.clients.consumer.ConsumerConfig
-		KafkaOutputConfig kafkaOutputConfig = new KafkaOutputConfig();
-		kafkaOutputConfig.setTopic("kafka2kafka");//设置kafka主题名称
+		Kafka2OutputConfig kafkaOutputConfig = new Kafka2OutputConfig();
+		kafkaOutputConfig.setTopic("mongodb2kafka");//设置kafka主题名称
 		kafkaOutputConfig.addKafkaProperty("value.serializer","org.apache.kafka.common.serialization.StringSerializer");
 		kafkaOutputConfig.addKafkaProperty("key.serializer","org.apache.kafka.common.serialization.LongSerializer");
 		kafkaOutputConfig.addKafkaProperty("compression.type","gzip");
-		kafkaOutputConfig.addKafkaProperty("bootstrap.servers","10.13.11.12:9092");
+		kafkaOutputConfig.addKafkaProperty("bootstrap.servers","10.13.6.12:9092");
 		kafkaOutputConfig.addKafkaProperty("batch.size","10");
 //		kafkaOutputConfig.addKafkaProperty("linger.ms","10000");
 //		kafkaOutputConfig.addKafkaProperty("buffer.memory","10000");
@@ -154,7 +157,7 @@ public class Mongodb2Kafka {
 
 			}
 		});
-		importBuilder.setKafkaOutputConfig(kafkaOutputConfig);
+		importBuilder.setOutputConfig(kafkaOutputConfig);
 		// 5.2.4.4 jdk timer定时任务时间配置（可选步骤，可以不需要做以下配置）
 		importBuilder.setFixedRate(false)//参考jdk timer task文档对fixedRate的说明
 //					 .setScheduleDate(date) //指定任务开始执行时间：日期

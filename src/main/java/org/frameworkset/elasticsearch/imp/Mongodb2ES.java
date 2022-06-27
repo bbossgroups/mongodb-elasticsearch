@@ -26,8 +26,10 @@ import org.frameworkset.spi.geoip.IpInfo;
 import org.frameworkset.tran.DataRefactor;
 import org.frameworkset.tran.DataStream;
 import org.frameworkset.tran.ExportResultHandler;
+import org.frameworkset.tran.config.ImportBuilder;
 import org.frameworkset.tran.context.Context;
-import org.frameworkset.tran.mongodb.input.es.MongoDB2ESExportBuilder;
+import org.frameworkset.tran.plugin.es.output.ElasticsearchOutputConfig;
+import org.frameworkset.tran.plugin.mongodb.input.MongoDBInputConfig;
 import org.frameworkset.tran.task.TaskCommand;
 
 import java.text.SimpleDateFormat;
@@ -73,7 +75,8 @@ public class Mongodb2ES {
 		// 5.2.1 创建elasticsearch index mapping(可选步骤)
 		//判断mongodbdemo是否存在，如果不存在则创建mongodbdemo
 		boolean indiceExist = clientInterface.existIndice("mongodbdemo");
-		ClientInterface configClientInterface = ElasticSearchHelper.getConfigRestClientUtil("dsl.xml");
+//		ClientInterface configClientInterface = ElasticSearchHelper.getConfigRestClientUtil("dsl.xml");//elasticsearch 7以下版本对接
+		ClientInterface configClientInterface = ElasticSearchHelper.getConfigRestClientUtil("dsl7.xml");
 		if(!indiceExist){
 
 			configClientInterface.createIndiceMapping("mongodbdemo","createMongodbdemoIndice");
@@ -85,11 +88,12 @@ public class Mongodb2ES {
 		}
 		// 5.2.4 编写同步代码
 		//定义Mongodb到Elasticsearch数据同步组件
-		MongoDB2ESExportBuilder importBuilder = MongoDB2ESExportBuilder.newInstance();
+		ImportBuilder importBuilder = new ImportBuilder();
 //		importBuilder.setStatusDbname("statusds");
 //		importBuilder.setStatusTableDML(DBConfig.mysql_createStatusTableSQL);
 		// 5.2.4.1 设置mongodb参数
-		importBuilder.setName("session")
+		MongoDBInputConfig mongoDBInputConfig = new MongoDBInputConfig();
+		mongoDBInputConfig.setName("session")
 				.setDb("sessiondb")
 				.setDbCollection("sessionmonitor_sessions")
 				.setConnectTimeout(10000)
@@ -127,7 +131,7 @@ public class Mongodb2ES {
 		Pattern hosts = Pattern.compile("^" + host + ".*$",
 				Pattern.CASE_INSENSITIVE);
 		query.append("host", new BasicDBObject("$regex",hosts));*/
-		importBuilder.setQuery(query);
+		mongoDBInputConfig.setQuery(query);
 
 		//设定需要返回的session数据字段信息（可选步骤，同步全部字段时可以不需要做下面配置）
 		BasicDBObject fetchFields = new BasicDBObject();
@@ -151,16 +155,21 @@ public class Mongodb2ES {
 		fetchFields.put("local", 1);
 		fetchFields.put("shardNo", 1);
 
-		importBuilder.setFetchFields(fetchFields);
+		mongoDBInputConfig.setFetchFields(fetchFields);
+		importBuilder.setInputConfig(mongoDBInputConfig);
 		// 5.2.4.3 导入elasticsearch参数配置
-		importBuilder
-				.setIndex("mongodbdemo") //必填项，索引名称
-				.setIndexType("mongodbdemo") //es 7以后的版本不需要设置indexType，es7以前的版本必需设置indexType
+		ElasticsearchOutputConfig elasticsearchOutputConfig = new ElasticsearchOutputConfig();
+		elasticsearchOutputConfig
+				.setEsIdField("_id")//设置文档主键，不设置，则自动产生文档id,直接将mongodb的ObjectId设置为Elasticsearch的文档_id
+				.setIndex("mongodbdemo") ;//必填项，索引名称
+//				.setIndexType("mongodbdemo") //es 7以后的版本不需要设置indexType，es7以前的版本必需设置indexType
 //				.setRefreshOption("refresh")//可选项，null表示不实时刷新，importBuilder.setRefreshOption("refresh");表示实时刷新
-				.setPrintTaskLog(true) //可选项，true 打印任务执行日志（耗时，处理记录数） false 不打印，默认值false
+		importBuilder.setOutputConfig(elasticsearchOutputConfig);
+
+		importBuilder.setPrintTaskLog(true) //可选项，true 打印任务执行日志（耗时，处理记录数） false 不打印，默认值false
 				.setBatchSize(10)  //可选项,批量导入es的记录数，默认为-1，逐条处理，> 0时批量处理
 				.setFetchSize(100)  //按批从mongodb拉取数据的大小
-		        .setEsIdField("_id")//设置文档主键，不设置，则自动产生文档id,直接将mongodb的ObjectId设置为Elasticsearch的文档_id
+
 				.setContinueOnError(true); // 忽略任务执行异常，任务执行过程抛出异常不中断任务执行
 
 		// 5.2.4.4 jdk timer定时任务时间配置（可选步骤，可以不需要做以下配置）

@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<properties>
+    <description>
+        <![CDATA[
+            配置dsl和mapping的xml文件
+         ]]>
+    </description>
+    <property name="createsmartcn">
+        <![CDATA[{
+            "settings": {
+                "number_of_shards": 1,
+                "index.refresh_interval": "5s"
+            },
+            "mappings": {
+                "properties": {
+
+                    "contentbody": {
+                        "type": "text",
+                         "analyzer": "smartcn"
+
+                    }
+
+                }
+            }
+        }]]>
+    </property>
+    <!--创建索引mongoddbdemo mapping定义-->
+    <property name="createMongodbdemoIndice">
+        <![CDATA[{
+            "settings": {
+                "number_of_shards": 6,
+                "index.refresh_interval": "5s"
+            },
+            "mappings": {
+
+                "properties": {
+                    "_validate": {
+                        "type": "boolean"
+                    },
+                    "appKey": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "creationTime": {
+                        "type": "date"
+                    },
+                    "extfiled": {
+                        "type": "long"
+                    },
+                    "extfiled2": {
+                        "type": "long"
+                    },
+                    "host": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "httpOnly": {
+                        "type": "boolean"
+                    },
+                    "lastAccessedHostIP": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "lastAccessedTime": {
+                        "type": "date"
+                    },
+                    "lastAccessedUrl": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "local": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "maxInactiveInterval": {
+                        "type": "long"
+                    },
+                    "privateAttr": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "referip": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "requesturi": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "secure": {
+                        "type": "boolean"
+                    },
+                    "sessionid": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+
+                    "userAccount": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    }
+                }
+
+            }
+        }]]>
+    </property>
+    <property name="createMongodbdemoTemplate">
+        <![CDATA[{
+            "index_patterns": "mongodbdemo-*", ## 5.x版本中请使用语法："template": "mongodbdemo-*"
+            "settings": {
+                "number_of_shards": 30,
+                "number_of_replicas" : 1,
+                "index.refresh_interval": "5s"
+            },
+            "mappings": {
+                "properties": {
+                    "_validate": {
+                        "type": "boolean"
+                    },
+                    "appKey": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "creationTime": {
+                        "type": "date"
+                    },
+                    "extfiled": {
+                        "type": "long"
+                    },
+                    "extfiled2": {
+                        "type": "long"
+                    },
+                    "host": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "httpOnly": {
+                        "type": "boolean"
+                    },
+                    "lastAccessedHostIP": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "lastAccessedTime": {
+                        "type": "date"
+                    },
+                    "lastAccessedUrl": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "local": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "maxInactiveInterval": {
+                        "type": "long"
+                    },
+                    "privateAttr": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "referip": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "requesturi": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "secure": {
+                        "type": "boolean"
+                    },
+                    "sessionid": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+
+                    "userAccount": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    }
+                }
+
+            }
+        }]]>
+    </property>
+</properties>

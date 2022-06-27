@@ -25,9 +25,11 @@ import org.frameworkset.tran.CommonRecord;
 import org.frameworkset.tran.DataRefactor;
 import org.frameworkset.tran.DataStream;
 import org.frameworkset.tran.ExportResultHandler;
+import org.frameworkset.tran.config.ImportBuilder;
 import org.frameworkset.tran.context.Context;
-import org.frameworkset.tran.mongodb.input.dummy.Mongodb2DummyExportBuilder;
 import org.frameworkset.tran.ouput.custom.CustomOutPut;
+import org.frameworkset.tran.plugin.custom.output.CustomOupputConfig;
+import org.frameworkset.tran.plugin.mongodb.input.MongoDBInputConfig;
 import org.frameworkset.tran.schedule.TaskContext;
 import org.frameworkset.tran.task.TaskCommand;
 import org.slf4j.Logger;
@@ -66,11 +68,12 @@ public class Mongodb2Custom {
 
 		// 5.2.4 编写同步代码
 		//定义Mongodb到dummy数据同步组件
-		Mongodb2DummyExportBuilder importBuilder = new Mongodb2DummyExportBuilder();
+		ImportBuilder importBuilder = new ImportBuilder();
 //		importBuilder.setStatusDbname("statusds");
 //		importBuilder.setStatusTableDML(DBConfig.mysql_createStatusTableSQL);
 		// 5.2.4.1 设置mongodb参数
-		importBuilder.setName("session")
+		MongoDBInputConfig mongoDBInputConfig = new MongoDBInputConfig();
+		mongoDBInputConfig.setName("session")
 				.setDb("sessiondb")
 				.setDbCollection("sessionmonitor_sessions")
 				.setConnectTimeout(10000)
@@ -108,7 +111,7 @@ public class Mongodb2Custom {
 		Pattern hosts = Pattern.compile("^" + host + ".*$",
 				Pattern.CASE_INSENSITIVE);
 		query.append("host", new BasicDBObject("$regex",hosts));*/
-		importBuilder.setQuery(query);
+		mongoDBInputConfig.setQuery(query);
 
 		//设定需要返回的session数据字段信息（可选步骤，同步全部字段时可以不需要做下面配置）
 		BasicDBObject fetchFields = new BasicDBObject();
@@ -132,9 +135,12 @@ public class Mongodb2Custom {
 		fetchFields.put("local", 1);
 		fetchFields.put("shardNo", 1);
 
-		importBuilder.setFetchFields(fetchFields);
+		mongoDBInputConfig.setFetchFields(fetchFields);
+		importBuilder.setInputConfig(mongoDBInputConfig);
+
+		CustomOupputConfig customOupputConfig = new CustomOupputConfig();
 		//自己处理数据
-		importBuilder.setCustomOutPut(new CustomOutPut() {
+		customOupputConfig.setCustomOutPut(new CustomOutPut() {
 			@Override
 			public void handleData(TaskContext taskContext, List<CommonRecord> datas) {
 
@@ -146,6 +152,7 @@ public class Mongodb2Custom {
 				}
 			}
 		});
+		importBuilder.setOutputConfig(customOupputConfig);
 		// 5.2.4.4 jdk timer定时任务时间配置（可选步骤，可以不需要做以下配置）
 		importBuilder.setFixedRate(false)//参考jdk timer task文档对fixedRate的说明
 //					 .setScheduleDate(date) //指定任务开始执行时间：日期

@@ -19,8 +19,10 @@ import com.mongodb.BasicDBObject;
 import org.frameworkset.tran.DataRefactor;
 import org.frameworkset.tran.DataStream;
 import org.frameworkset.tran.ExportResultHandler;
+import org.frameworkset.tran.config.ImportBuilder;
 import org.frameworkset.tran.context.Context;
-import org.frameworkset.tran.mongodb.input.db.MongoDB2DBExportBuilder;
+import org.frameworkset.tran.plugin.db.output.DBOutputConfig;
+import org.frameworkset.tran.plugin.mongodb.input.MongoDBInputConfig;
 import org.frameworkset.tran.schedule.CallInterceptor;
 import org.frameworkset.tran.schedule.TaskContext;
 import org.frameworkset.tran.task.TaskCommand;
@@ -54,13 +56,15 @@ public class Mongodb2DBdemo {
 	 * elasticsearch地址和数据库地址都从外部配置文件application.properties中获取，加载数据源配置和es配置
 	 */
 	public void scheduleTimestampImportData( ){
-		MongoDB2DBExportBuilder importBuilder = MongoDB2DBExportBuilder.newInstance();
+		ImportBuilder importBuilder = new ImportBuilder();
 		//导入数据库和sql配置，数据库相关的配置已经在application.properties文件中配置，这里只需要指定sql配置文件和sqlName即可
-		importBuilder.setSqlName("insertSQLnew") //指定将mongodb文档数据同步到数据库的sql语句名称，配置在sqlFile.xml中
+		DBOutputConfig dbOutputConfig = new DBOutputConfig();
+		dbOutputConfig.setSqlName("insertSQLnew") //指定将mongodb文档数据同步到数据库的sql语句名称，配置在sqlFile.xml中
 					 .setSqlFilepath("sqlFile.xml");
+		importBuilder.setOutputConfig(dbOutputConfig);
 		//mongodb的相关配置参数
-
-		importBuilder.setName("session")
+		MongoDBInputConfig mongoDBInputConfig = new MongoDBInputConfig();
+		mongoDBInputConfig.setName("session")
 				.setDb("sessiondb")
 				.setDbCollection("sessionmonitor_sessions")
 				.setConnectTimeout(10000)
@@ -134,7 +138,7 @@ public class Mongodb2DBdemo {
 
 		}
 		 */
-		importBuilder.setQuery(query);
+		mongoDBInputConfig.setQuery(query);
 
 		//设定需要召回的字段信息
 		BasicDBObject fetchFields = new BasicDBObject();
@@ -156,13 +160,13 @@ public class Mongodb2DBdemo {
 		fetchFields.put("testVO", 1);
 		fetchFields.put("privateAttr", 1);
 		fetchFields.put("local", 1);
-		importBuilder.setFetchFields(fetchFields);
+		mongoDBInputConfig.setFetchFields(fetchFields);
 
 		// 设置MongoDB检索选项
 //		DBCollectionFindOptions dbCollectionFindOptions = new DBCollectionFindOptions();
 //		dbCollectionFindOptions.maxTime(10000l, TimeUnit.MILLISECONDS);
-//		importBuilder.setDbCollectionFindOptions(dbCollectionFindOptions);
-
+//		mongoDBInputConfig.setDbCollectionFindOptions(dbCollectionFindOptions);
+		importBuilder.setInputConfig(mongoDBInputConfig);
 		//全局忽略字段
 //		importBuilder.addIgnoreFieldMapping("remark1");
 		/**
@@ -274,8 +278,6 @@ public class Mongodb2DBdemo {
 		importBuilder.setContinueOnError(true);//任务出现异常，是否继续执行作业：true（默认值）继续执行 false 中断作业执行
 		importBuilder.setAsyn(false);//true 异步方式执行，不等待所有导入作业任务结束，方法快速返回；false（默认值） 同步方式执行，等待所有导入作业任务结束，所有作业结束后方法才返回
 
-		importBuilder.setDebugResponse(false);//设置是否将每次处理的reponse打印到日志文件中，默认false
-		importBuilder.setDiscardBulkResponse(false);//设置是否需要批量处理的响应报文，不需要设置为false，true为需要，默认false
 //设置任务处理结果回调接口
 		importBuilder.setExportResultHandler(new ExportResultHandler<Object,String>() {
 			@Override

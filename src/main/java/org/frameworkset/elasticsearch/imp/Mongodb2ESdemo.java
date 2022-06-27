@@ -21,8 +21,10 @@ import org.frameworkset.spi.geoip.IpInfo;
 import org.frameworkset.tran.DataRefactor;
 import org.frameworkset.tran.DataStream;
 import org.frameworkset.tran.ExportResultHandler;
+import org.frameworkset.tran.config.ImportBuilder;
 import org.frameworkset.tran.context.Context;
-import org.frameworkset.tran.mongodb.input.es.MongoDB2ESExportBuilder;
+import org.frameworkset.tran.plugin.es.output.ElasticsearchOutputConfig;
+import org.frameworkset.tran.plugin.mongodb.input.MongoDBInputConfig;
 import org.frameworkset.tran.schedule.CallInterceptor;
 import org.frameworkset.tran.schedule.TaskContext;
 import org.frameworkset.tran.task.TaskCommand;
@@ -57,7 +59,6 @@ public class Mongodb2ESdemo {
 	 * elasticsearch地址和数据库地址都从外部配置文件application.properties中获取，加载数据源配置和es配置
 	 */
 	public void scheduleTimestampImportData(boolean dropIndice){
-		MongoDB2ESExportBuilder importBuilder = MongoDB2ESExportBuilder.newInstance();
 		//增量定时任务不要删表，但是可以通过删表来做初始化操作
 		if(dropIndice) {
 			try {
@@ -68,10 +69,12 @@ public class Mongodb2ESdemo {
 			}
 		}
 
-
-		//mongodb的相关配置参数
-
-		importBuilder.setName("session")
+		ImportBuilder importBuilder = new ImportBuilder();
+//		importBuilder.setStatusDbname("statusds");
+//		importBuilder.setStatusTableDML(DBConfig.mysql_createStatusTableSQL);
+		// 5.2.4.1 设置mongodb参数
+		MongoDBInputConfig mongoDBInputConfig = new MongoDBInputConfig();
+		mongoDBInputConfig.setName("session")
 				.setDb("sessiondb")
 				.setDbCollection("sessionmonitor_sessions")
 				.setConnectTimeout(10000)
@@ -90,14 +93,19 @@ public class Mongodb2ESdemo {
 				.setAutoConnectRetry(true);
 //		importBuilder.addIgnoreFieldMapping("remark1");
 //		importBuilder.setSql("select * from td_sm_log ");
+		importBuilder.setInputConfig(mongoDBInputConfig);
 		/**
 		 * es相关配置
 		 */
-		importBuilder
-				.setIndex("mongodbdemo") //必填项，索引名称
+
+		ElasticsearchOutputConfig elasticsearchOutputConfig = new ElasticsearchOutputConfig();
+		elasticsearchOutputConfig
+				.setEsIdField("_id")//设置文档主键，不设置，则自动产生文档id,直接将mongodb的ObjectId设置为Elasticsearch的文档_id
+				.setIndex("mongodbdemo"); //必填项，索引名称
 				//.setIndexType("mongodbdemo") //es 7以后的版本不需要设置indexType，es7以前的版本必需设置indexType
 //				.setRefreshOption("refresh")//可选项，null表示不实时刷新，importBuilder.setRefreshOption("refresh");表示实时刷新
-				.setPrintTaskLog(true) //可选项，true 打印任务执行日志（耗时，处理记录数） false 不打印，默认值false
+		importBuilder.setOutputConfig(elasticsearchOutputConfig);
+		importBuilder.setPrintTaskLog(true) //可选项，true 打印任务执行日志（耗时，处理记录数） false 不打印，默认值false
 				.setBatchSize(10)  //可选项,批量导入es的记录数，默认为-1，逐条处理，> 0时批量处理
 				.setFetchSize(100); //按批从mongodb拉取数据的大小
 		//定时任务配置，
@@ -219,12 +227,7 @@ public class Mongodb2ESdemo {
 		importBuilder.setThreadCount(50);//设置批量导入线程池工作线程数量
 		importBuilder.setContinueOnError(true);//任务出现异常，是否继续执行作业：true（默认值）继续执行 false 中断作业执行
 		importBuilder.setAsyn(false);//true 异步方式执行，不等待所有导入作业任务结束，方法快速返回；false（默认值） 同步方式执行，等待所有导入作业任务结束，所有作业结束后方法才返回
-		importBuilder.setEsIdField("_id");//设置文档主键，不设置，则自动产生文档id,直接将mongodb的ObjectId设置为Elasticsearch的文档_id
-//		importBuilder.setDebugResponse(false);//设置是否将每次处理的reponse打印到日志文件中，默认false，不打印响应报文将大大提升性能，只有在调试需要的时候才打开，log日志级别同时要设置为INFO
-//		importBuilder.setDiscardBulkResponse(true);//设置是否需要批量处理的响应报文，不需要设置为false，true为需要，默认true，如果不需要响应报文将大大提升处理速度
 
-		importBuilder.setDebugResponse(false);//设置是否将每次处理的reponse打印到日志文件中，默认false
-		importBuilder.setDiscardBulkResponse(false);//设置是否需要批量处理的响应报文，不需要设置为false，true为需要，默认false
 		//设置任务处理结果回调接口
 		importBuilder.setExportResultHandler(new ExportResultHandler<Object,String>() {
 			@Override

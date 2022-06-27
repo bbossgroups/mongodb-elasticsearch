@@ -26,11 +26,12 @@ import org.frameworkset.tran.CommonRecord;
 import org.frameworkset.tran.DataRefactor;
 import org.frameworkset.tran.DataStream;
 import org.frameworkset.tran.ExportResultHandler;
+import org.frameworkset.tran.config.ImportBuilder;
 import org.frameworkset.tran.context.Context;
-import org.frameworkset.tran.mongodb.input.fileftp.Mongodb2FileFtpImportBuilder;
-import org.frameworkset.tran.output.fileftp.FileOupputConfig;
 import org.frameworkset.tran.output.fileftp.FilenameGenerator;
 import org.frameworkset.tran.output.ftp.FtpOutConfig;
+import org.frameworkset.tran.plugin.file.output.FileOutputConfig;
+import org.frameworkset.tran.plugin.mongodb.input.MongoDBInputConfig;
 import org.frameworkset.tran.schedule.CallInterceptor;
 import org.frameworkset.tran.schedule.TaskContext;
 import org.frameworkset.tran.task.TaskCommand;
@@ -67,11 +68,12 @@ public class Mongodb2FileFtp {
 
 		// 5.2.4 编写同步代码
 		//定义Mongodb到dummy数据同步组件
-		Mongodb2FileFtpImportBuilder importBuilder = new Mongodb2FileFtpImportBuilder();
+		ImportBuilder importBuilder = new ImportBuilder();
 //		importBuilder.setStatusDbname("statusds");
 //		importBuilder.setStatusTableDML(DBConfig.mysql_createStatusTableSQL);
 		// 5.2.4.1 设置mongodb参数
-		importBuilder.setName("session")
+		MongoDBInputConfig mongoDBInputConfig = new MongoDBInputConfig();
+		mongoDBInputConfig.setName("session")
 				.setDb("sessiondb")
 				.setDbCollection("sessionmonitor_sessions")
 				.setConnectTimeout(10000)
@@ -109,7 +111,7 @@ public class Mongodb2FileFtp {
 		Pattern hosts = Pattern.compile("^" + host + ".*$",
 				Pattern.CASE_INSENSITIVE);
 		query.append("host", new BasicDBObject("$regex",hosts));*/
-		importBuilder.setQuery(query);
+		mongoDBInputConfig.setQuery(query);
 
 		//设定需要返回的session数据字段信息（可选步骤，同步全部字段时可以不需要做下面配置）
 		BasicDBObject fetchFields = new BasicDBObject();
@@ -133,10 +135,11 @@ public class Mongodb2FileFtp {
 		fetchFields.put("local", 1);
 		fetchFields.put("shardNo", 1);
 
-		importBuilder.setFetchFields(fetchFields);
+		mongoDBInputConfig.setFetchFields(fetchFields);
+		importBuilder.setInputConfig(mongoDBInputConfig);
 		// 5.2.4.3 导入dummy参数配置
 		String ftpIp = CommonLauncher.getProperty("ftpIP","10.13.6.127");//同时指定了默认值
-		FileOupputConfig fileFtpOupputConfig = new FileOupputConfig();
+		FileOutputConfig fileFtpOupputConfig = new FileOutputConfig();
 		FtpOutConfig ftpOutConfig = new FtpOutConfig();
 		ftpOutConfig.setFtpIP(ftpIp);
 
@@ -153,9 +156,8 @@ public class Mongodb2FileFtp {
 		ftpOutConfig.setSuccessFilesCleanInterval(5000);
 		ftpOutConfig.setFileLiveTime(86400);//设置上传成功文件备份保留时间，默认2天
 		fileFtpOupputConfig.setFtpOutConfig(ftpOutConfig);
-		fileFtpOupputConfig.setFileDir("D:\\workdir");
-		fileFtpOupputConfig.setMaxFileRecordSize(20);//每千条记录生成一个文件
-		fileFtpOupputConfig.setDisableftp(false);//false 启用sftp/ftp上传功能,true 禁止（只生成数据文件，保留在FileDir对应的目录下面）
+		fileFtpOupputConfig.setFileDir("D:\\workdir\\mondodb");
+		fileFtpOupputConfig.setMaxFileRecordSize(20);//每20条记录生成一个文件
 		//自定义文件名称
 		fileFtpOupputConfig.setFilenameGenerator(new FilenameGenerator() {
 			@Override
@@ -189,7 +191,7 @@ public class Mongodb2FileFtp {
 
 			}
 		});
-		importBuilder.setFileOupputConfig(fileFtpOupputConfig);
+		importBuilder.setOutputConfig(fileFtpOupputConfig);
 		importBuilder.setIncreamentEndOffset(300);//单位秒，同步从上次同步截止时间当前时间前5分钟的数据，下次继续从上次截止时间开始同步数据
 //设置任务执行拦截器，可以添加多个
 		importBuilder.addCallInterceptor(new CallInterceptor() {
