@@ -27,8 +27,8 @@ mongodb 到数据库数据同步
 ```xml
 <dependency>
   <groupId>com.bbossgroups.plugins</groupId>
-  <artifactId>bboss-elasticsearch-rest-mongodb</artifactId>
-  <version>6.6.0</version>
+  <artifactId>bboss-datatran-mongodb</artifactId>
+  <version>6.7.0</version>
   <scope>compile</scope>
 </dependency>
 ```

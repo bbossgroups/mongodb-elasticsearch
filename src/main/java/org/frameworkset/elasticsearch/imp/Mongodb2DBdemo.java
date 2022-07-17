@@ -357,7 +357,6 @@ public class Mongodb2DBdemo {
 		DataStream dataStream = importBuilder.builder();
 		dataStream.execute();//执行同步操作
 
-		System.out.println();
 	}
 
 }
