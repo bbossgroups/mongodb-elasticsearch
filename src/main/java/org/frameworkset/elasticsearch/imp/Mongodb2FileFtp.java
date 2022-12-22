@@ -210,7 +210,7 @@ public class Mongodb2FileFtp {
 			}
 
 			@Override
-			public void throwException(TaskContext taskContext, Exception e) {
+			public void throwException(TaskContext taskContext, Throwable e) {
 				System.out.println("throwException 1");
 			}
 		});
@@ -325,7 +325,7 @@ public class Mongodb2FileFtp {
 			}
 
 			@Override
-			public void exception(TaskCommand<Object,String> taskCommand, Exception exception) {
+			public void exception(TaskCommand<Object,String> taskCommand, Throwable exception) {
 				System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
 			}
 

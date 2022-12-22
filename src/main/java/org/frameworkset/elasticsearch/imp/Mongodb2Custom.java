@@ -264,7 +264,7 @@ public class Mongodb2Custom {
 			}
 
 			@Override
-			public void exception(TaskCommand<Object,String> taskCommand, Exception exception) {
+			public void exception(TaskCommand<Object,String> taskCommand, Throwable exception) {
 				System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
 			}
 

@@ -242,7 +242,7 @@ public class Mongodb2ESdemo {
 			}
 
 			@Override
-			public void exception(TaskCommand<Object,String> taskCommand, Exception exception) {
+			public void exception(TaskCommand<Object,String> taskCommand, Throwable exception) {
 				logger.info(taskCommand.getTaskMetrics().toString(),exception);//打印任务执行情况
 			}
 
@@ -263,7 +263,7 @@ public class Mongodb2ESdemo {
 			}
 
 			@Override
-			public void throwException(TaskContext taskContext, Exception e) {
+			public void throwException(TaskContext taskContext, Throwable e) {
 				logger.info(taskContext.getJobTaskMetrics().toString(),e);//打印任务执行情况
 			}
 		});

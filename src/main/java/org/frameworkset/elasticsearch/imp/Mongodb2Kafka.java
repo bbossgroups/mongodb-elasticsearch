@@ -269,7 +269,7 @@ public class Mongodb2Kafka {
 			}
 
 			@Override
-			public void exception(TaskCommand<Object, RecordMetadata> taskCommand, Exception exception) {
+			public void exception(TaskCommand<Object, RecordMetadata> taskCommand, Throwable exception) {
 				System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
 			}
 

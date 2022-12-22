@@ -253,7 +253,7 @@ public class Mongodb2Dummy {
 			}
 
 			@Override
-			public void exception(TaskCommand<Object,String> taskCommand, Exception exception) {
+			public void exception(TaskCommand<Object,String> taskCommand, Throwable exception) {
 				System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
 			}
 
