@@ -5,6 +5,7 @@
             配置数据导入sql
          ]]>
     </description>
+    <property name="demoexport"><![CDATA[select * from td_sm_log where log_id > #[log_id]]]></property>
     <property name="createMongoddbdemoIndice">
         <![CDATA[{
             "settings": {
