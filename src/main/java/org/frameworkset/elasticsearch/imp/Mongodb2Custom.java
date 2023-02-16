@@ -27,7 +27,7 @@ import org.frameworkset.tran.DataStream;
 import org.frameworkset.tran.ExportResultHandler;
 import org.frameworkset.tran.config.ImportBuilder;
 import org.frameworkset.tran.context.Context;
-import org.frameworkset.tran.plugin.custom.output.CustomOupputConfig;
+import org.frameworkset.tran.plugin.custom.output.CustomOutputConfig;
 import org.frameworkset.tran.plugin.custom.output.CustomOutPut;
 import org.frameworkset.tran.plugin.mongodb.input.MongoDBInputConfig;
 import org.frameworkset.tran.schedule.TaskContext;
@@ -138,7 +138,7 @@ public class Mongodb2Custom {
 		mongoDBInputConfig.setFetchFields(fetchFields);
 		importBuilder.setInputConfig(mongoDBInputConfig);
 
-		CustomOupputConfig customOupputConfig = new CustomOupputConfig();
+		CustomOutputConfig customOupputConfig = new CustomOutputConfig();
 		//自己处理数据
 		customOupputConfig.setCustomOutPut(new CustomOutPut() {
 			@Override
