@@ -28,7 +28,7 @@ mongodb 到数据库数据同步
 <dependency>
   <groupId>com.bbossgroups.plugins</groupId>
   <artifactId>bboss-datatran-mongodb</artifactId>
-  <version>6.8.3</version>
+  <version>6.8.5</version>
   <scope>compile</scope>
 </dependency>
 ```
