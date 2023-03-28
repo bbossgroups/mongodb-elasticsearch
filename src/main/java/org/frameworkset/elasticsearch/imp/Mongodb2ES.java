@@ -287,10 +287,7 @@ public class Mongodb2ES {
 				System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
 			}
 
-			@Override
-			public int getMaxRetry() {
-				return 0;
-			}
+
 		});
 
 		/**

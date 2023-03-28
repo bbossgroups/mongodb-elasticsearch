@@ -192,10 +192,7 @@ public class DB2MongodbDemo {
 				logger.info(taskCommand.getTaskMetrics().toString(),exception);//打印任务执行情况
 			}
 
-			@Override
-			public int getMaxRetry() {
-				return 0;
-			}
+
 		});
 		importBuilder.addCallInterceptor(new CallInterceptor() {
 			@Override

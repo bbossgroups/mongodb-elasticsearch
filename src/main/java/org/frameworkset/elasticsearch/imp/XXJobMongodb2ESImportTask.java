@@ -263,10 +263,7 @@ public class XXJobMongodb2ESImportTask extends AbstractXXLJobHandler {
 					logger.error("",exception);
 				}
 
-				@Override
-				public int getMaxRetry() {
-					return 0;
-				}
+
 			});
 
 			// 5.2.4.9 设置增量字段信息（可选步骤，全量同步不需要做以下配置）
