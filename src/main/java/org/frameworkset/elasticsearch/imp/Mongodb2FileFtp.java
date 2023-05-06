@@ -225,7 +225,6 @@ public class Mongodb2FileFtp {
 		importBuilder.setQueue(10);//设置批量导入线程池等待队列长度
 		importBuilder.setThreadCount(50);//设置批量导入线程池工作线程数量
 		importBuilder.setContinueOnError(true);//任务出现异常，是否继续执行作业：true（默认值）继续执行 false 中断作业执行
-		importBuilder.setAsyn(false);//是否同步等待每批次任务执行完成后再返回调度程序，true 不等待所有导入作业任务结束，方法快速返回；false（默认值） 等待所有导入作业任务结束，所有作业结束后方法才返回
 
 		// 5.2.4.6 数据加工处理（可选步骤，可以不需要做以下配置）
 		// 全局记录配置：打tag，标识数据来源于jdk timer
