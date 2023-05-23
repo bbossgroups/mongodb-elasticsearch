@@ -145,8 +145,8 @@ public class Mongodb2FileFtp {
 
 		ftpOutConfig.setFtpPort(5322);
 //		ftpOutConfig.addHostKeyVerifier("2a:da:5a:6a:cf:7d:65:e5:ac:ff:d3:73:7f:2c:55:c9");
-		ftpOutConfig.setFtpUser("ecs");
-		ftpOutConfig.setFtpPassword("ecs@123");
+		ftpOutConfig.setFtpUser("root");
+		ftpOutConfig.setFtpPassword("123456");
 		ftpOutConfig.setRemoteFileDir("/home/ecs/failLog");
 		ftpOutConfig.setKeepAliveTimeout(100000);
 		ftpOutConfig.setTransferEmptyFiles(false);
