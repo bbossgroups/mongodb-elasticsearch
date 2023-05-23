@@ -138,7 +138,7 @@ public class Mongodb2FileFtp {
 		mongoDBInputConfig.setFetchFields(fetchFields);
 		importBuilder.setInputConfig(mongoDBInputConfig);
 		// 5.2.4.3 导入dummy参数配置
-		String ftpIp = CommonLauncher.getProperty("ftpIP","10.13.6.127");//同时指定了默认值
+		String ftpIp = CommonLauncher.getProperty("ftpIP","127.0.0.1");//同时指定了默认值
 		FileOutputConfig fileFtpOupputConfig = new FileOutputConfig();
 		FtpOutConfig ftpOutConfig = new FtpOutConfig();
 		ftpOutConfig.setFtpIP(ftpIp);

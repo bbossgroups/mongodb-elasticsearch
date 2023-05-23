@@ -140,7 +140,7 @@ public class Mongodb2Kafka {
 		kafkaOutputConfig.addKafkaProperty("value.serializer","org.apache.kafka.common.serialization.StringSerializer");
 		kafkaOutputConfig.addKafkaProperty("key.serializer","org.apache.kafka.common.serialization.LongSerializer");
 		kafkaOutputConfig.addKafkaProperty("compression.type","gzip");
-		kafkaOutputConfig.addKafkaProperty("bootstrap.servers","10.13.6.12:9092");
+		kafkaOutputConfig.addKafkaProperty("bootstrap.servers","127.0.0.1:9092");
 		kafkaOutputConfig.addKafkaProperty("batch.size","10");
 //		kafkaOutputConfig.addKafkaProperty("linger.ms","10000");
 //		kafkaOutputConfig.addKafkaProperty("buffer.memory","10000");
