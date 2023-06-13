@@ -70,8 +70,6 @@ public class Mongodb2ESdemo {
 		}
 
 		ImportBuilder importBuilder = new ImportBuilder();
-//		importBuilder.setStatusDbname("statusds");
-//		importBuilder.setStatusTableDML(DBConfig.mysql_createStatusTableSQL);
 		// 5.2.4.1 设置mongodb参数
 		MongoDBInputConfig mongoDBInputConfig = new MongoDBInputConfig();
 		mongoDBInputConfig.setName("session")
@@ -91,8 +89,7 @@ public class Mongodb2ESdemo {
 //				.buildClientMongoCredential("sessiondb","bboss","bboss","MONGODB-CR")
 //				.setOption("")
 				.setAutoConnectRetry(true);
-//		importBuilder.addIgnoreFieldMapping("remark1");
-//		importBuilder.setSql("select * from td_sm_log ");
+
 		importBuilder.setInputConfig(mongoDBInputConfig);
 		/**
 		 * es相关配置
