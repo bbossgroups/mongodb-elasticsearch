@@ -57,8 +57,8 @@ public class DB2MongodbDemo {
 
 		ImportBuilder importBuilder = new ImportBuilder();
 		// 5.2.4.1 设置mongodb参数
-		MongoDBOutputConfig mongoDBInputConfig = new MongoDBOutputConfig();
-		mongoDBInputConfig.setName("testes2mg")
+		MongoDBOutputConfig mongoDBOutputConfig = new MongoDBOutputConfig();
+		mongoDBOutputConfig.setName("testes2mg")//mongodb数据源名称
 				.setDb("testdb")
 				.setDbCollection("db2mongodemo")
 				.setConnectTimeout(10000)
@@ -76,7 +76,7 @@ public class DB2MongodbDemo {
 //				.setOption("")
 				.setAutoConnectRetry(true);
 
-		importBuilder.setOutputConfig(mongoDBInputConfig);
+		importBuilder.setOutputConfig(mongoDBOutputConfig);
 		/**
 		 * es相关配置
 		 */
