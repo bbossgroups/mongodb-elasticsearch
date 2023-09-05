@@ -17,10 +17,6 @@ package org.frameworkset.elasticsearch.imp;
 
 import com.frameworkset.util.SimpleStringUtil;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import org.frameworkset.session.TestVO;
-import org.frameworkset.soa.ObjectSerializable;
-import org.frameworkset.spi.geoip.IpInfo;
 import org.frameworkset.tran.CommonRecord;
 import org.frameworkset.tran.DataRefactor;
 import org.frameworkset.tran.DataStream;
@@ -29,12 +25,11 @@ import org.frameworkset.tran.config.ImportBuilder;
 import org.frameworkset.tran.context.Context;
 import org.frameworkset.tran.plugin.dummy.output.DummyOutputConfig;
 import org.frameworkset.tran.plugin.mongodb.input.MongoDBInputConfig;
+import org.frameworkset.tran.schedule.ImportIncreamentConfig;
 import org.frameworkset.tran.task.TaskCommand;
 import org.frameworkset.tran.util.RecordGenerator;
 
 import java.io.Writer;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * <p>Description: </p>
@@ -44,14 +39,14 @@ import java.util.Date;
  * @author biaoping.yin
  * @version 1.0
  */
-public class Mongodb2Dummy {
+public class MongodbDate2Dummy {
 	/**
 	 * 启动运行同步作业主方法
 	 * @param args
 	 */
 	public static void main(String[] args){
 
-		Mongodb2Dummy dbdemo = new Mongodb2Dummy();
+		MongodbDate2Dummy dbdemo = new MongodbDate2Dummy();
 		dbdemo.scheduleImportData();
 	}
 
@@ -68,9 +63,9 @@ public class Mongodb2Dummy {
 //		importBuilder.setStatusTableDML(DBConfig.mysql_createStatusTableSQL);
 		// 5.2.4.1 设置mongodb参数
 		MongoDBInputConfig mongoDBInputConfig = new MongoDBInputConfig();
-		mongoDBInputConfig.setName("session")
-				.setDb("sessiondb")
-				.setDbCollection("sessionmonitor_sessions")
+		mongoDBInputConfig.setName("useusu")
+				.setDb("useusu")
+				.setDbCollection("classes")
 				.setConnectTimeout(10000)
 				.setWriteConcern("JOURNAL_SAFE")
 				.setReadPreference("")
@@ -86,49 +81,34 @@ public class Mongodb2Dummy {
 //				.setOption("")
 				.setAutoConnectRetry(true);
 
-		//定义mongodb数据查询条件对象（可选步骤，全量同步可以不需要做条件配置）
-		BasicDBObject query = new BasicDBObject();
-		// 设定检索mongdodb session数据时间范围条件
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-		try {
-			Date start_date = format.parse("1099-01-01");
-			Date end_date = format.parse("2999-01-01");
-			query.append("creationTime",
-					new BasicDBObject("$gte", start_date.getTime()).append(
-							"$lte", end_date.getTime()));
-		}
-		catch (Exception e){
-			e.printStackTrace();
-		}
-		/**
-		// 设置按照host字段值进行正则匹配查找session数据条件（可选步骤，全量同步可以不需要做条件配置）
-		String host = "169.254.252.194-DESKTOP-U3V5C85";
-		Pattern hosts = Pattern.compile("^" + host + ".*$",
-				Pattern.CASE_INSENSITIVE);
-		query.append("host", new BasicDBObject("$regex",hosts));*/
-		mongoDBInputConfig.setQuery(query);
+//		//定义mongodb数据查询条件对象（可选步骤，全量同步可以不需要做条件配置）
+//		BasicDBObject query = new BasicDBObject();
+//		// 设定检索mongdodb session数据时间范围条件
+//		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+//		try {
+//			Date start_date = format.parse("1099-01-01");
+//			Date end_date = format.parse("2999-01-01");
+//			query.append("creationTime",
+//					new BasicDBObject("$gte", start_date.getTime()).append(
+//							"$lte", end_date.getTime()));
+//		}
+//		catch (Exception e){
+//			e.printStackTrace();
+//		}
+//		/**
+//		// 设置按照host字段值进行正则匹配查找session数据条件（可选步骤，全量同步可以不需要做条件配置）
+//		String host = "169.254.252.194-DESKTOP-U3V5C85";
+//		Pattern hosts = Pattern.compile("^" + host + ".*$",
+//				Pattern.CASE_INSENSITIVE);
+//		query.append("host", new BasicDBObject("$regex",hosts));*/
+//		mongoDBInputConfig.setQuery(query);
 
 		//设定需要返回的session数据字段信息（可选步骤，同步全部字段时可以不需要做下面配置）
 		BasicDBObject fetchFields = new BasicDBObject();
-		fetchFields.put("appKey", 1);
-		fetchFields.put("sessionid", 1);
+		fetchFields.put("name", 1);
 		fetchFields.put("creationTime", 1);
-		fetchFields.put("lastAccessedTime", 1);
-		fetchFields.put("maxInactiveInterval", 1);
-		fetchFields.put("referip", 1);
-		fetchFields.put("_validate", 1);
-		fetchFields.put("host", 1);
-		fetchFields.put("requesturi", 1);
-		fetchFields.put("lastAccessedUrl", 1);
-		fetchFields.put("secure",1);
-		fetchFields.put("httpOnly", 1);
-		fetchFields.put("lastAccessedHostIP", 1);
+		fetchFields.put("members", 1);
 
-		fetchFields.put("userAccount",1);
-		fetchFields.put("testVO", 1);
-		fetchFields.put("privateAttr", 1);
-		fetchFields.put("local", 1);
-		fetchFields.put("shardNo", 1);
 
 		mongoDBInputConfig.setFetchFields(fetchFields);
 		importBuilder.setInputConfig(mongoDBInputConfig);
@@ -160,74 +140,7 @@ public class Mongodb2Dummy {
 		// 数据记录级别的转换处理（可选步骤，可以不需要做以下配置）
 		importBuilder.setDataRefactor(new DataRefactor() {
 			public void refactor(Context context) throws Exception  {
-				String id = context.getStringValue("_id");
-				//根据字段值忽略对应的记录，这条记录将不会被同步到elasticsearch中
-				if(id.equals("5dcaa59e9832797f100c6806"))
-					context.setDrop(true);
-				//添加字段extfiled2到记录中，值为2
-				context.addFieldValue("extfiled2",2);
-				//添加字段extfiled到记录中，值为1
-				context.addFieldValue("extfiled",1);
-				boolean httpOnly = context.getBooleanValue("httpOnly");
-				boolean secure = context.getBooleanValue("secure");
-				String shardNo = context.getStringValue("shardNo");
-				if(shardNo != null){
-					//利用xml序列化组件将xml报文序列化为一个Integer
-					context.addFieldValue("shardNo", ObjectSerializable.toBean(shardNo,Integer.class));
-				}
-				else{
-					context.addFieldValue("shardNo", 0);
-				}
-				//空值处理
-				String userAccount = context.getStringValue("userAccount");
-				if(userAccount == null)
-					context.addFieldValue("userAccount","");
-				else{
-					//利用xml序列化组件将xml报文序列化为一个String
-					context.addFieldValue("userAccount", ObjectSerializable.toBean(userAccount,String.class));
-				}
-				//空值处理
-				String testVO = context.getStringValue("testVO");
-				if(testVO == null)
-					context.addFieldValue("testVO","");
-				else{
-					//利用xml序列化组件将xml报文序列化为一个TestVO
-					TestVO testVO1 = ObjectSerializable.toBean(testVO, TestVO.class);
-					context.addFieldValue("testVO", testVO1);
-				}
-				//空值处理
-				String privateAttr = context.getStringValue("privateAttr");
-				if(privateAttr == null) {
-					context.addFieldValue("privateAttr", "");
-				}
-				else{
-					//利用xml序列化组件将xml报文序列化为一个String
-					context.addFieldValue("privateAttr", ObjectSerializable.toBean(privateAttr, String.class));
-				}
-				//空值处理
-				String local = context.getStringValue("local");
-				if(local == null)
-					context.addFieldValue("local","");
-				else{
-					//利用xml序列化组件将xml报文序列化为一个String
-					context.addFieldValue("local", ObjectSerializable.toBean(local, String.class));
-				}
-				//将long类型的lastAccessedTime字段转换为日期类型
-				long lastAccessedTime = context.getLongValue("lastAccessedTime");
-				context.addFieldValue("lastAccessedTime",new Date(lastAccessedTime));
-				//将long类型的creationTime字段转换为日期类型
-				long creationTime = context.getLongValue("creationTime");
-				context.addFieldValue("creationTime",new Date(creationTime));
-				//根据session访问客户端ip，获取对应的客户地理位置经纬度信息、运营商信息、省地市信息IpInfo对象
-				//并将IpInfo添加到Elasticsearch文档中
-				String referip = context.getStringValue("referip");
-				if(referip != null){
-					IpInfo ipInfo = context.getIpInfoByIp(referip);
-					if(ipInfo != null)
-						context.addFieldValue("ipInfo",ipInfo);
-				}
-				//除了通过context接口获取mongodb的记录字段，还可以直接获取当前的mongodb记录，可自行利用里面的值进行相关处理
-				DBObject record = (DBObject) context.getRecord();
+
 			}
 		});
 
@@ -275,17 +188,11 @@ public class Mongodb2Dummy {
 
 		// 5.2.4.9 设置增量字段信息（可选步骤，全量同步不需要做以下配置）
 		//增量配置开始
-		importBuilder.setLastValueColumn("lastAccessedTime");//手动指定数字增量查询字段
+		importBuilder.setLastValueColumn("creationTime");//手动指定数字增量查询字段
 		importBuilder.setFromFirst(false);//任务重启时，重新开始采集数据，true 重新开始，false不重新开始，适合于每次全量导入数据的情况，如果是全量导入，可以先删除原来的索引数据
-		importBuilder.setLastValueStorePath("mongodb_import");//记录上次采集的增量字段值的文件路径，作为下次增量（或者重启后）采集数据的起点，不同的任务这个路径要不一样
-		//设置增量查询的起始值lastvalue
-		try {
-			Date date = format.parse("2000-01-01");
-			importBuilder.setLastValue(date.getTime());
-		}
-		catch (Exception e){
-			e.printStackTrace();
-		}
+		importBuilder.setLastValueStorePath("mongodbdate_import");//记录上次采集的增量字段值的文件路径，作为下次增量（或者重启后）采集数据的起点，不同的任务这个路径要不一样
+        importBuilder.setLastValueType(ImportIncreamentConfig.TIMESTAMP_TYPE);
+
 
 		// 5.2.4.10 执行作业
 		/**
