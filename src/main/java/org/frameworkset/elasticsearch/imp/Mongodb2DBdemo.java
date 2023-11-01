@@ -30,7 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -141,25 +143,26 @@ public class Mongodb2DBdemo {
 		mongoDBInputConfig.setQuery(query);
 
 		//设定需要召回的字段信息
-		BasicDBObject fetchFields = new BasicDBObject();
-		fetchFields.put("appKey", 1);
-		fetchFields.put("sessionid", 1);
-		fetchFields.put("creationTime", 1);
-		fetchFields.put("lastAccessedTime", 1);
-		fetchFields.put("maxInactiveInterval", 1);
-		fetchFields.put("referip", 1);
-		fetchFields.put("_validate", 1);
-		fetchFields.put("host", 1);
-		fetchFields.put("requesturi", 1);
-		fetchFields.put("lastAccessedUrl", 1);
-		fetchFields.put("secure",1);
-		fetchFields.put("httpOnly", 1);
-		fetchFields.put("lastAccessedHostIP", 1);
+		List<String> fetchFields = new ArrayList<>();
+		fetchFields.add("appKey");
+		fetchFields.add("sessionid");
+		fetchFields.add("creationTime");
+		fetchFields.add("lastAccessedTime");
+		fetchFields.add("maxInactiveInterval");
+		fetchFields.add("referip");
+		fetchFields.add("_validate");
+		fetchFields.add("host");
+		fetchFields.add("requesturi");
+		fetchFields.add("lastAccessedUrl");
+		fetchFields.add("secure");
+		fetchFields.add("httpOnly");
+		fetchFields.add("lastAccessedHostIP");
 
-		fetchFields.put("userAccount",1);
-		fetchFields.put("testVO", 1);
-		fetchFields.put("privateAttr", 1);
-		fetchFields.put("local", 1);
+		fetchFields.add("userAccount");
+		fetchFields.add("testVO");
+		fetchFields.add("privateAttr");
+		fetchFields.add("local");
+		fetchFields.add("shardNo");
 		mongoDBInputConfig.setFetchFields(fetchFields);
 
 		// 设置MongoDB检索选项

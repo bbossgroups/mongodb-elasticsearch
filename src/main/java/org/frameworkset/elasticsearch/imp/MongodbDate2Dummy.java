@@ -30,6 +30,8 @@ import org.frameworkset.tran.task.TaskCommand;
 import org.frameworkset.tran.util.RecordGenerator;
 
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Description: </p>
@@ -104,10 +106,10 @@ public class MongodbDate2Dummy {
 //		mongoDBInputConfig.setQuery(query);
 
 		//设定需要返回的session数据字段信息（可选步骤，同步全部字段时可以不需要做下面配置）
-		BasicDBObject fetchFields = new BasicDBObject();
-		fetchFields.put("name", 1);
-		fetchFields.put("creationTime", 1);
-		fetchFields.put("members", 1);
+		List<String> fetchFields = new ArrayList<>();
+		fetchFields.add("name");
+		fetchFields.add("creationTime");
+		fetchFields.add("members");
 
 
 		mongoDBInputConfig.setFetchFields(fetchFields);
