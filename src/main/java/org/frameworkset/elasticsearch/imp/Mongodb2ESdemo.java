@@ -15,7 +15,7 @@ package org.frameworkset.elasticsearch.imp;
  * limitations under the License.
  */
 
-import com.mongodb.DBObject;
+import org.bson.Document;
 import org.frameworkset.elasticsearch.ElasticSearchHelper;
 import org.frameworkset.spi.geoip.IpInfo;
 import org.frameworkset.tran.DataRefactor;
@@ -206,7 +206,7 @@ public class Mongodb2ESdemo {
 				context.newName2ndData("axx","newname",newvalue);
 				 */
 				 //除了通过context接口获取mongodb的记录字段，还可以直接获取当前的mongodb记录，可自行利用里面的值进行相关处理
-				DBObject record = (DBObject) context.getRecord();
+				Document record = (Document) context.getRecord();
 				//上述三个属性已经放置到docInfo中，如果无需再放置到索引文档中，可以忽略掉这些属性
 //				context.addIgnoreFieldMapping("author");
 //				context.addIgnoreFieldMapping("title");

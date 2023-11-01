@@ -16,7 +16,7 @@ package org.frameworkset.elasticsearch.imp;
  */
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
+import org.bson.Document;
 import org.frameworkset.elasticsearch.serial.SerialUtil;
 import org.frameworkset.runtime.CommonLauncher;
 import org.frameworkset.session.TestVO;
@@ -301,7 +301,7 @@ public class Mongodb2FileFtp {
 						context.addFieldValue("ipInfo",ipInfo);
 				}
 				//除了通过context接口获取mongodb的记录字段，还可以直接获取当前的mongodb记录，可自行利用里面的值进行相关处理
-				DBObject record = (DBObject) context.getRecord();
+				Document record = (Document) context.getRecord();
 			}
 		});
 

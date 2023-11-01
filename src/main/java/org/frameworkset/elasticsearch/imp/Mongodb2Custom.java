@@ -18,6 +18,7 @@ package org.frameworkset.elasticsearch.imp;
 import com.frameworkset.util.SimpleStringUtil;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import org.bson.Document;
 import org.frameworkset.session.TestVO;
 import org.frameworkset.soa.ObjectSerializable;
 import org.frameworkset.spi.geoip.IpInfo;
@@ -84,13 +85,13 @@ public class Mongodb2Custom {
 				.setSocketTimeout(1500).setSocketKeepAlive(true)
 				.setConnectionsPerHost(100)
 				.setThreadsAllowedToBlockForConnectionMultiplier(6)
-				.setServerAddresses("127.0.0.1:27017")//多个地址用回车换行符分割：127.0.0.1:27017\n127.0.0.1:27018
+				.setServerAddresses("192.168.137.1:27017,192.168.137.1:27018,192.168.137.1:27019")//多个地址用回车换行符分割：127.0.0.1:27017\n127.0.0.1:27018
 				// mechanism 取值范围：PLAIN GSSAPI MONGODB-CR MONGODB-X509，默认为MONGODB-CR
 				//String database,String userName,String password,String mechanism
 				//https://www.iteye.com/blog/yin-bp-2064662
 //				.buildClientMongoCredential("sessiondb","bboss","bboss","MONGODB-CR")
 //				.setOption("")
-				.setAutoConnectRetry(true);
+				;
 
 		//定义mongodb数据查询条件对象（可选步骤，全量同步可以不需要做条件配置）
 		BasicDBObject query = new BasicDBObject();
@@ -239,7 +240,7 @@ public class Mongodb2Custom {
 						context.addFieldValue("ipInfo",ipInfo);
 				}
 				//除了通过context接口获取mongodb的记录字段，还可以直接获取当前的mongodb记录，可自行利用里面的值进行相关处理
-				DBObject record = (DBObject) context.getRecord();
+				Document record = (Document) context.getRecord();
 			}
 		});
 
@@ -288,7 +289,7 @@ public class Mongodb2Custom {
 		// 5.2.4.9 设置增量字段信息（可选步骤，全量同步不需要做以下配置）
 		//增量配置开始
 		importBuilder.setLastValueColumn("lastAccessedTime");//手动指定数字增量查询字段
-		importBuilder.setFromFirst(true);//任务重启时，重新开始采集数据，true 重新开始，false不重新开始，适合于每次全量导入数据的情况，如果是全量导入，可以先删除原来的索引数据
+		importBuilder.setFromFirst(false);//任务重启时，重新开始采集数据，true 重新开始，false不重新开始，适合于每次全量导入数据的情况，如果是全量导入，可以先删除原来的索引数据
 		importBuilder.setLastValueStorePath("mongodb_import");//记录上次采集的增量字段值的文件路径，作为下次增量（或者重启后）采集数据的起点，不同的任务这个路径要不一样
 		//设置增量查询的起始值lastvalue
 		try {
