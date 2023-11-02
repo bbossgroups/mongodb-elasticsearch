@@ -115,7 +115,7 @@ public class MongodbCDCDemo {
         importBuilder.setParallel(true);//设置为多线程并行批量导入,false串行
         importBuilder.setQueue(10);//设置批量导入线程池等待队列长度
         importBuilder.setThreadCount(50);//设置批量导入线程池工作线程数量
-        importBuilder.setContinueOnError(true);//任务出现异常，是否继续执行作业：true（默认值）继续执行 false 中断作业执行
+        importBuilder.setContinueOnError(false);//任务出现异常，是否继续执行作业：true（默认值）继续执行 false 中断作业执行
 
         // 5.2.4.6 数据加工处理（可选步骤，可以不需要做以下配置）
         // 全局记录配置：打tag，标识数据来源于jdk timer
@@ -123,6 +123,9 @@ public class MongodbCDCDemo {
         // 数据记录级别的转换处理（可选步骤，可以不需要做以下配置）
         importBuilder.setDataRefactor(new DataRefactor() {
             public void refactor(Context context) throws Exception {
+                logger.info("context.isDelete():"+context.isDelete());
+                logger.info("context.isUpdate():"+context.isUpdate());
+                logger.info("context.isInsert():"+context.isInsert());
                 String id = context.getStringValue("_id");
                 //根据字段值忽略对应的记录，这条记录将不会被同步到elasticsearch中
                 if (id.equals("5dcaa59e9832797f100c6806"))
@@ -246,5 +249,6 @@ public class MongodbCDCDemo {
          */
         DataStream dataStream = importBuilder.builder();
         dataStream.execute();//执行同步操作
+        logger.info("dataStream started.");
     }
 }
