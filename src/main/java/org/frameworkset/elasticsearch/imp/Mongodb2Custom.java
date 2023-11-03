@@ -84,7 +84,6 @@ public class Mongodb2Custom {
 				.setMaxWaitTime(10000)
 				.setSocketTimeout(1500).setSocketKeepAlive(true)
 				.setConnectionsPerHost(100)
-				.setThreadsAllowedToBlockForConnectionMultiplier(6)
 				.setServerAddresses("192.168.137.1:27017,192.168.137.1:27018,192.168.137.1:27019")//多个地址用回车换行符分割：127.0.0.1:27017\n127.0.0.1:27018
 				// mechanism 取值范围：PLAIN GSSAPI MONGODB-CR MONGODB-X509，默认为MONGODB-CR
 				//String database,String userName,String password,String mechanism

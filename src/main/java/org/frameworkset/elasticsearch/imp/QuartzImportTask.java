@@ -51,13 +51,12 @@ public class QuartzImportTask extends AbstractQuartzJobHandler {
 					.setWriteConcern("JOURNAL_SAFE").setReadPreference("")
 					.setSocketTimeout(1500)
 					.setConnectionsPerHost(100)
-					.setThreadsAllowedToBlockForConnectionMultiplier(6)
 					.setServerAddresses("127.0.0.1:27017")
 					// mechanism 取值范围：PLAIN GSSAPI MONGODB-CR MONGODB-X509，默认为MONGODB-CR
 					//String database,String userName,String password,String mechanism
 					//https://www.iteye.com/blog/yin-bp-2064662
 //				.buildClientMongoCredential("sessiondb","bboss","bboss","MONGODB-CR")
-					.setAutoConnectRetry(true);
+					;
 			importBuilder.setInputConfig(mongoDBInputConfig);
 //		importBuilder.addIgnoreFieldMapping("remark1");
 //		importBuilder.setSql("select * from td_sm_log ");

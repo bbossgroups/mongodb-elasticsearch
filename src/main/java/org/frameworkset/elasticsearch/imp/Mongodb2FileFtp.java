@@ -84,14 +84,13 @@ public class Mongodb2FileFtp {
 				.setMaxWaitTime(10000)
 				.setSocketTimeout(1500).setSocketKeepAlive(true)
 				.setConnectionsPerHost(100)
-				.setThreadsAllowedToBlockForConnectionMultiplier(6)
 				.setServerAddresses("127.0.0.1:27017")//多个地址用回车换行符分割：127.0.0.1:27017\n127.0.0.1:27018
 				// mechanism 取值范围：PLAIN GSSAPI MONGODB-CR MONGODB-X509，默认为MONGODB-CR
 				//String database,String userName,String password,String mechanism
 				//https://www.iteye.com/blog/yin-bp-2064662
 //				.buildClientMongoCredential("sessiondb","bboss","bboss","MONGODB-CR")
 //				.setOption("")
-				.setAutoConnectRetry(true);
+				;
 
 		//定义mongodb数据查询条件对象（可选步骤，全量同步可以不需要做条件配置）
 		BasicDBObject query = new BasicDBObject();
