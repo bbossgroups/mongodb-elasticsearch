@@ -134,6 +134,7 @@ public class MongodbCDC2MongoDBDemo {
 	            TableMapping tableMapping = new TableMapping();
 				tableMapping.setTargetDatabase("testdb");
 	            tableMapping.setTargetCollection("testcdc");
+	            tableMapping.setTargetDatasource("testes2mg");
 
 	            context.setTableMapping(tableMapping);
 	            logger.info("table:"+table);
