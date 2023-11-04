@@ -70,10 +70,10 @@ public class MongodbCDC2MongoDBDemo {
 //		importBuilder.setStatusDbname("statusds");
 //		importBuilder.setStatusTableDML(DBConfig.mysql_createStatusTableSQL);
         // 5.2.4.1 设置mongodb参数
-        MongoCDCInputConfig mongoDBInputConfig = new MongoCDCInputConfig();
-        mongoDBInputConfig.setName("session");
-        mongoDBInputConfig.setEnableIncrement(true);
-        mongoDBInputConfig.setIncludePreImage(true)
+        MongoCDCInputConfig mongoCDCInputConfig = new MongoCDCInputConfig();
+        mongoCDCInputConfig.setName("session");
+        mongoCDCInputConfig.setEnableIncrement(true);
+        mongoCDCInputConfig.setIncludePreImage(true)
 		        .setUpdateLookup(true)
                 .setDbIncludeList("sessiondb")
 		        .setCollectionIncludeList("sessionmonitor_sessions,session_sessions")
@@ -89,13 +89,15 @@ public class MongodbCDC2MongoDBDemo {
 //				.setUserName("bboss")
 //		        .setPassword("bboss")
 //		        .setMechanism("MONGODB-CR")
+//		        .setAuthDb("sessiondb")
                 ;
 
 
-        importBuilder.setInputConfig(mongoDBInputConfig);
+        importBuilder.setInputConfig(mongoCDCInputConfig);
 
 	    MongoDBOutputConfig mongoDBOutputConfig = new MongoDBOutputConfig();
 	    mongoDBOutputConfig.setMultiCollections(true);
+
 	    mongoDBOutputConfig.setName("testes2mg")
 			    .setDb("testdb1")
 			    .setDbCollection("demo")

@@ -75,10 +75,10 @@ public class MongodbCDCDemo {
 //		importBuilder.setStatusDbname("statusds");
 //		importBuilder.setStatusTableDML(DBConfig.mysql_createStatusTableSQL);
         // 5.2.4.1 设置mongodb参数
-        MongoCDCInputConfig mongoDBInputConfig = new MongoCDCInputConfig();
-        mongoDBInputConfig.setName("session");
-        mongoDBInputConfig.setEnableIncrement(true);
-        mongoDBInputConfig.setIncludePreImage(true).setUpdateLookup(true)
+        MongoCDCInputConfig mongoCDCInputConfig = new MongoCDCInputConfig();
+        mongoCDCInputConfig.setName("session");
+        mongoCDCInputConfig.setEnableIncrement(true);
+        mongoCDCInputConfig.setIncludePreImage(true).setUpdateLookup(true)
                 .setDbIncludeList("sessiondb").setCollectionIncludeList("sessionmonitor_sessions,session_sessions")
                 .setConnectString("mongodb://192.168.137.1:27017,192.168.137.1:27018,192.168.137.1:27019/?replicaSet=rs0")
                 .setConnectTimeout(10000)
@@ -93,7 +93,7 @@ public class MongodbCDCDemo {
                 ;
 
 
-        importBuilder.setInputConfig(mongoDBInputConfig);
+        importBuilder.setInputConfig(mongoCDCInputConfig);
 
         CustomOutputConfig customOupputConfig = new CustomOutputConfig();
         //自己处理数据
