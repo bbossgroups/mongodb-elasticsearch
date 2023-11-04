@@ -81,7 +81,7 @@ public class Mongodb2ESdemo {
 				.setMaxWaitTime(10000)
 				.setSocketTimeout(1500).setSocketKeepAlive(true)
 				.setConnectionsPerHost(100)
-				.setServerAddresses("127.0.0.1:27017")//多个地址用回车换行符分割：127.0.0.1:27017\n127.0.0.1:27018
+				.setConnectString("mongodb://192.168.137.1:27017,192.168.137.1:27018,192.168.137.1:27019/?replicaSet=rs0")
 				// mechanism 取值范围：PLAIN GSSAPI MONGODB-CR MONGODB-X509，默认为MONGODB-CR
 				//String database,String userName,String password,String mechanism
 				//https://www.iteye.com/blog/yin-bp-2064662
@@ -114,7 +114,7 @@ public class Mongodb2ESdemo {
 
 		//增量配置开始
 		importBuilder.setLastValueColumn("lastAccessedTime");//手动指定数字增量查询字段
-		importBuilder.setFromFirst(false);//任务重启时，重新开始采集数据，true 重新开始，false不重新开始，适合于每次全量导入数据的情况，如果是全量导入，可以先删除原来的索引数据
+		importBuilder.setFromFirst(true);//任务重启时，重新开始采集数据，true 重新开始，false不重新开始，适合于每次全量导入数据的情况，如果是全量导入，可以先删除原来的索引数据
 		importBuilder.setLastValueStorePath("mongodbes_import");//记录上次采集的增量字段值的文件路径，作为下次增量（或者重启后）采集数据的起点，不同的任务这个路径要不一样
 //		importBuilder.setLastValueStoreTableName("logs");//记录上次采集的增量字段值的表，可以不指定，采用默认表名increament_tab
 //		importBuilder.setLastValueType(ImportIncreamentConfig.TIMESTAMP_TYPE);//指定字段类型：ImportIncreamentConfig.NUMBER_TYPE 数字类型,ImportIncreamentConfig.TIMESTAMP_TYPE为时间类型
@@ -224,20 +224,20 @@ public class Mongodb2ESdemo {
 		importBuilder.setContinueOnError(true);//任务出现异常，是否继续执行作业：true（默认值）继续执行 false 中断作业执行
 
 		//设置任务处理结果回调接口
-		importBuilder.setExportResultHandler(new ExportResultHandler<Object,String>() {
+		importBuilder.setExportResultHandler(new ExportResultHandler<Object,Object>() {
 			@Override
-			public void success(TaskCommand<Object,String> taskCommand, String result) {
+			public void success(TaskCommand<Object,Object> taskCommand, Object result) {
 				logger.info(taskCommand.getTaskMetrics().toString());//打印任务执行情况
 			}
 
 			@Override
-			public void error(TaskCommand<Object,String> taskCommand, String result) {
+			public void error(TaskCommand<Object,Object> taskCommand, Object result) {
 				logger.info(taskCommand.getTaskMetrics().toString());//打印任务执行情况
 
 			}
 
 			@Override
-			public void exception(TaskCommand<Object,String> taskCommand, Throwable exception) {
+			public void exception(TaskCommand<Object,Object> taskCommand, Throwable exception) {
 				logger.info(taskCommand.getTaskMetrics().toString(),exception);//打印任务执行情况
 			}
 

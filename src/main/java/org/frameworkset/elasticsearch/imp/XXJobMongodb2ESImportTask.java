@@ -236,16 +236,16 @@ public class XXJobMongodb2ESImportTask extends AbstractXXLJobHandler {
 
 			// 5.2.4.7 设置同步作业结果回调处理函数（可选步骤，可以不需要做以下配置）
 			//设置任务处理结果回调接口
-			importBuilder.setExportResultHandler(new ExportResultHandler<Object,String>() {
+			importBuilder.setExportResultHandler(new ExportResultHandler<Object,Object>() {
 				@Override
-				public void success(TaskCommand<Object,String> taskCommand, String result) {
+				public void success(TaskCommand<Object,Object> taskCommand, Object result) {
 					System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
 
 
 				}
 
 				@Override
-				public void error(TaskCommand<Object,String> taskCommand, String result) {
+				public void error(TaskCommand<Object,Object> taskCommand, Object result) {
 					System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
 					System.out.println(result);
 					/**
@@ -258,7 +258,7 @@ public class XXJobMongodb2ESImportTask extends AbstractXXLJobHandler {
 				}
 
 				@Override
-				public void exception(TaskCommand<Object,String> taskCommand, Throwable exception) {
+				public void exception(TaskCommand<Object,Object> taskCommand, Throwable exception) {
 					System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
 					logger.error("",exception);
 				}

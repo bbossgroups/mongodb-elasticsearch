@@ -86,7 +86,9 @@ public class MongodbCDC2MongoDBDemo {
                 // mechanism 取值范围：PLAIN GSSAPI MONGODB-CR MONGODB-X509，默认为MONGODB-CR
                 //String database,String userName,String password,String mechanism
                 //https://www.iteye.com/blog/yin-bp-2064662
-//				.buildClientMongoCredential("sessiondb","bboss","bboss","MONGODB-CR")
+//				.setUserName("bboss")
+//		        .setPassword("bboss")
+//		        .setMechanism("MONGODB-CR")
                 ;
 
 
@@ -107,10 +109,12 @@ public class MongodbCDC2MongoDBDemo {
 	    // mechanism 取值范围：PLAIN GSSAPI MONGODB-CR MONGODB-X509，默认为MONGODB-CR
 	    //String database,String userName,String password,String mechanism
 	    //https://www.iteye.com/blog/yin-bp-2064662
-//				.buildClientMongoCredential("sessiondb","bboss","bboss","MONGODB-CR")
-//				.setOption("");
+//				.setUserName("bboss")
+//		        .setPassword("bboss")
+//		        .setMechanism("MONGODB-CR");
 	    ;
 
+	    mongoDBOutputConfig.setObjectIdField("_id");//全局指定文档_id值对应的字段
 	    importBuilder.setOutputConfig(mongoDBOutputConfig);
 
         // 5.2.4.5 并行任务配置（可选步骤，可以不需要做以下配置）
@@ -125,11 +129,11 @@ public class MongodbCDC2MongoDBDemo {
             public void refactor(Context context) throws Exception {
                 logger.info("context.isDelete():"+context.isDelete());
                 logger.info("context.isUpdate():"+context.isUpdate());
-//				if(context.isUpdate()){
-//					context.setDrop(true);
-//					return;
-//				}
+				if(context.isUpdate()){
+					context.markRecoredReplace();//采用替代模式更新修改数据，验证功能用，实际情况根据需要进行修改或者替代处理
+				}
                 logger.info("context.isInsert():"+context.isInsert());
+				context.setRecordKeyField("_id");//记录级别指定文档_id值对应的字段
 	            String table = (String)context.getMetaValue("table");//记录来源collection，默认输出表
 	            String database = (String)context.getMetaValue("database");//记录来源db
 	            TableMapping tableMapping = new TableMapping();
@@ -145,14 +149,14 @@ public class MongodbCDC2MongoDBDemo {
 
         // 5.2.4.7 设置同步作业结果回调处理函数（可选步骤，可以不需要做以下配置）
         //设置任务处理结果回调接口
-        importBuilder.setExportResultHandler(new ExportResultHandler<Object, String>() {
+        importBuilder.setExportResultHandler(new ExportResultHandler<Object, Object>() {
             @Override
-            public void success(TaskCommand<Object, String> taskCommand, String result) {
+            public void success(TaskCommand<Object, Object> taskCommand, Object result) {
                 System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
             }
 
             @Override
-            public void error(TaskCommand<Object, String> taskCommand, String result) {
+            public void error(TaskCommand<Object, Object> taskCommand, Object result) {
                 System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
                 /**
                  //分析result，提取错误数据修改后重新执行,
@@ -164,7 +168,7 @@ public class MongodbCDC2MongoDBDemo {
             }
 
             @Override
-            public void exception(TaskCommand<Object, String> taskCommand, Throwable exception) {
+            public void exception(TaskCommand<Object, Object> taskCommand, Throwable exception) {
                 System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
             }
 
