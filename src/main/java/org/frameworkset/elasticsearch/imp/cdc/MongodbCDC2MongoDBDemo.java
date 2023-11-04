@@ -93,6 +93,7 @@ public class MongodbCDC2MongoDBDemo {
         importBuilder.setInputConfig(mongoDBInputConfig);
 
 	    MongoDBOutputConfig mongoDBOutputConfig = new MongoDBOutputConfig();
+	    mongoDBOutputConfig.setMultiCollections(true);
 	    mongoDBOutputConfig.setName("testes2mg")
 			    .setDb("testdb1")
 			    .setDbCollection("demo")
@@ -129,12 +130,12 @@ public class MongodbCDC2MongoDBDemo {
 //					return;
 //				}
                 logger.info("context.isInsert():"+context.isInsert());
-	            String table = (String)context.getMetaValue("table");
-	            String database = (String)context.getMetaValue("database");
+	            String table = (String)context.getMetaValue("table");//记录来源collection，默认输出表
+	            String database = (String)context.getMetaValue("database");//记录来源db
 	            TableMapping tableMapping = new TableMapping();
-				tableMapping.setTargetDatabase("testdb");
-	            tableMapping.setTargetCollection("testcdc");
-	            tableMapping.setTargetDatasource("testes2mg");
+	            tableMapping.setTargetDatabase("testdb");//目标库
+	            tableMapping.setTargetCollection("testcdc");//目标表
+	            tableMapping.setTargetDatasource("testes2mg");//指定MongoDB数据源名称，对应一个MongoDB集群
 
 	            context.setTableMapping(tableMapping);
 	            logger.info("table:"+table);
