@@ -90,7 +90,6 @@ public class MongodbCDCDemo {
                 // mechanism 取值范围：PLAIN GSSAPI MONGODB-CR MONGODB-X509，默认为MONGODB-CR
                 //String database,String userName,String password,String mechanism
                 //https://www.iteye.com/blog/yin-bp-2064662
-//				.buildClientMongoCredential("sessiondb","bboss","bboss","MONGODB-CR")
                 ;
 
 
