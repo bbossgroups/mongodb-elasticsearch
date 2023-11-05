@@ -18,15 +18,13 @@ package org.frameworkset.elasticsearch.imp.cdc;
 import com.frameworkset.util.SimpleStringUtil;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.client.model.changestream.OperationType;
 import org.frameworkset.elasticsearch.imp.Mongodb2Custom;
 import org.frameworkset.elasticsearch.imp.Mongodb2Dummy;
 import org.frameworkset.session.TestVO;
 import org.frameworkset.soa.ObjectSerializable;
 import org.frameworkset.spi.geoip.IpInfo;
-import org.frameworkset.tran.CommonRecord;
-import org.frameworkset.tran.DataRefactor;
-import org.frameworkset.tran.DataStream;
-import org.frameworkset.tran.ExportResultHandler;
+import org.frameworkset.tran.*;
 import org.frameworkset.tran.config.ImportBuilder;
 import org.frameworkset.tran.context.Context;
 import org.frameworkset.tran.plugin.custom.output.CustomOutPut;
@@ -78,6 +76,9 @@ public class MongodbCDCDemo {
         MongoCDCInputConfig mongoCDCInputConfig = new MongoCDCInputConfig();
         mongoCDCInputConfig.setName("session");
         mongoCDCInputConfig.setEnableIncrement(true);
+//        mongoCDCInputConfig.addIncludeOperation(Record.RECORD_INSERT);
+//        mongoCDCInputConfig.addIncludeOperation(Record.RECORD_UPDATE);
+//        mongoCDCInputConfig.addIncludeOperation(Record.RECORD_DELETE);
         mongoCDCInputConfig.setIncludePreImage(true).setUpdateLookup(true)
                 .setDbIncludeList("sessiondb").setCollectionIncludeList("sessionmonitor_sessions,session_sessions")
                 .setConnectString("mongodb://192.168.137.1:27017,192.168.137.1:27018,192.168.137.1:27019/?replicaSet=rs0")
