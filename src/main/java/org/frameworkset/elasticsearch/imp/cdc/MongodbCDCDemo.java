@@ -27,10 +27,12 @@ import org.frameworkset.spi.geoip.IpInfo;
 import org.frameworkset.tran.*;
 import org.frameworkset.tran.config.ImportBuilder;
 import org.frameworkset.tran.context.Context;
+import org.frameworkset.tran.metrics.ETLMetricsCallInterceptor;
 import org.frameworkset.tran.plugin.custom.output.CustomOutPut;
 import org.frameworkset.tran.plugin.custom.output.CustomOutputConfig;
 import org.frameworkset.tran.plugin.mongocdc.MongoCDCInputConfig;
 import org.frameworkset.tran.plugin.mongodb.input.MongoDBInputConfig;
+import org.frameworkset.tran.schedule.CallInterceptor;
 import org.frameworkset.tran.schedule.TaskContext;
 import org.frameworkset.tran.task.TaskCommand;
 import org.slf4j.Logger;
@@ -200,12 +202,12 @@ public class MongodbCDCDemo {
         importBuilder.setExportResultHandler(new ExportResultHandler<Object, Object>() {
             @Override
             public void success(TaskCommand<Object, Object> taskCommand, Object result) {
-                System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
+                logger.info(taskCommand.getTaskMetrics().toString());//打印任务执行情况
             }
 
             @Override
             public void error(TaskCommand<Object, Object> taskCommand, Object result) {
-                System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
+                logger.info(taskCommand.getTaskMetrics().toString());//打印任务执行情况
                 /**
                  //分析result，提取错误数据修改后重新执行,
                  Object datas = taskCommand.getDatas();
@@ -217,10 +219,26 @@ public class MongodbCDCDemo {
 
             @Override
             public void exception(TaskCommand<Object, Object> taskCommand, Throwable exception) {
-                System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
+                logger.info(taskCommand.getTaskMetrics().toString());//打印任务执行情况
             }
 
 
+        });
+        importBuilder.addCallInterceptor(new CallInterceptor() {
+            @Override
+            public void preCall(TaskContext taskContext) {
+//                logger.info(taskContext.getJobTaskMetrics().toString());//打印任务执行情况
+            }
+
+            @Override
+            public void afterCall(TaskContext taskContext) {
+                logger.info(taskContext.getJobTaskMetrics().toString());//打印任务执行情况
+            }
+
+            @Override
+            public void throwException(TaskContext taskContext, Throwable throwable) {
+                logger.info(taskContext.getJobTaskMetrics().toString());//打印任务执行情况
+            }
         });
 
         /**
