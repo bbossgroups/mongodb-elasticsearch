@@ -18,7 +18,10 @@ package org.frameworkset.elasticsearch.imp;
 import com.frameworkset.util.SimpleStringUtil;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.MongoClientSettings;
 import org.bson.Document;
+import org.frameworkset.nosql.mongodb.CustomSettingBuilder;
+import org.frameworkset.nosql.mongodb.MongoDBConfig;
 import org.frameworkset.session.TestVO;
 import org.frameworkset.soa.ObjectSerializable;
 import org.frameworkset.spi.geoip.IpInfo;
@@ -90,6 +93,20 @@ public class Mongodb2Custom {
 				//https://www.iteye.com/blog/yin-bp-2064662
 //				.buildClientMongoCredential("sessiondb","bboss","bboss","MONGODB-CR")
 //				.setOption("")
+                .setCustomSettingBuilder(new CustomSettingBuilder() {
+                    @Override
+                    public void customSettingBuilder(MongoClientSettings.Builder builder, MongoDBConfig mongoDBConfig) {
+                        //自定义ssl配置
+                        /**             clientBuilder.applyToSslSettings(builder -> {
+                         *                 builder.invalidHostNameAllowed(true);
+                         *                 builder.enabled(true);
+                         *                 builder.context(sscontext);     
+                         *              });
+                         **/
+                        logger.info("Come to customSettingBuilder.....");
+                 
+                    }
+                })
 				;
 
 		//定义mongodb数据查询条件对象（可选步骤，全量同步可以不需要做条件配置）
