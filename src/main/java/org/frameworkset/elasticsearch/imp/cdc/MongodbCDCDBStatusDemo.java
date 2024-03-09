@@ -16,6 +16,8 @@ package org.frameworkset.elasticsearch.imp.cdc;
  */
 
 import com.frameworkset.util.SimpleStringUtil;
+import org.bson.BsonValue;
+import org.frameworkset.elasticsearch.client.ResultUtil;
 import org.frameworkset.session.TestVO;
 import org.frameworkset.soa.ObjectSerializable;
 import org.frameworkset.spi.geoip.IpInfo;
@@ -28,6 +30,7 @@ import org.frameworkset.tran.context.Context;
 import org.frameworkset.tran.plugin.custom.output.CustomOutPut;
 import org.frameworkset.tran.plugin.custom.output.CustomOutputConfig;
 import org.frameworkset.tran.plugin.mongocdc.MongoCDCInputConfig;
+import org.frameworkset.tran.record.ValueConvert;
 import org.frameworkset.tran.schedule.TaskContext;
 import org.frameworkset.tran.task.TaskCommand;
 import org.slf4j.Logger;
@@ -113,9 +116,31 @@ public class MongodbCDCDBStatusDemo {
         // 5.2.4.6 数据加工处理（可选步骤，可以不需要做以下配置）
         // 全局记录配置：打tag，标识数据来源于jdk timer
         importBuilder.addFieldValue("fromTag", "jdk timer");
+        ValueConvert<Boolean> booleanValueConvert = new ValueConvert<Boolean>(){
+
+            @Override
+            public Boolean convert(Object value) {
+                if(value instanceof BsonValue){
+                    return ((BsonValue)value).asBoolean().getValue();
+                }
+                return   ResultUtil.booleanValue(value,false);
+            }
+        };
+
+        ValueConvert<String> stringValueConvert = new ValueConvert<String>(){
+
+            @Override
+            public String convert(Object value) {
+                if(value instanceof BsonValue){
+                    return ((BsonValue)value).asString().getValue();
+                }
+                return   ResultUtil.stringValue(value,null);
+            }
+        };
         // 数据记录级别的转换处理（可选步骤，可以不需要做以下配置）
         importBuilder.setDataRefactor(new DataRefactor() {
             public void refactor(Context context) throws Exception {
+                boolean isUpdate = context.isUpdate();
                 logger.info("context.isDelete():"+context.isDelete());
                 logger.info("context.isUpdate():"+context.isUpdate());
                 logger.info("context.isInsert():"+context.isInsert());
@@ -127,8 +152,9 @@ public class MongodbCDCDBStatusDemo {
                 context.addFieldValue("extfiled2", 2);
                 //添加字段extfiled到记录中，值为1
                 context.addFieldValue("extfiled", 1);
-                boolean httpOnly = context.getBooleanValue("httpOnly");
-                boolean secure = context.getBooleanValue("secure");
+                
+                boolean httpOnly =  context.getBooleanValue("httpOnly");
+                boolean secure = context.getBooleanValue("secure",booleanValueConvert);
                 String shardNo = context.getStringValue("shardNo");
                 if (shardNo != null) {
                     //利用xml序列化组件将xml报文序列化为一个Integer
@@ -137,7 +163,7 @@ public class MongodbCDCDBStatusDemo {
                     context.addFieldValue("shardNo", 0);
                 }
                 //空值处理
-                String userAccount = context.getStringValue("userAccount");
+                String userAccount = context.getStringValue("userAccount",stringValueConvert);
                 if (userAccount == null)
                     context.addFieldValue("userAccount", "");
                 else {
