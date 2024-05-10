@@ -30,6 +30,7 @@ import org.frameworkset.tran.config.ImportBuilder;
 import org.frameworkset.tran.context.Context;
 import org.frameworkset.tran.plugin.dummy.output.DummyOutputConfig;
 import org.frameworkset.tran.plugin.mongodb.input.MongoDBInputConfig;
+import org.frameworkset.tran.schedule.TaskContext;
 import org.frameworkset.tran.task.TaskCommand;
 import org.frameworkset.tran.util.RecordGenerator;
 
@@ -138,7 +139,7 @@ public class Mongodb2Dummy {
 		DummyOutputConfig dummyOupputConfig = new DummyOutputConfig();
 		dummyOupputConfig.setRecordGenerator(new RecordGenerator() {
 			@Override
-			public void buildRecord(Context taskContext, CommonRecord record, Writer builder) throws Exception{
+			public void buildRecord(TaskContext taskContext, CommonRecord record, Writer builder) throws Exception{
 				SimpleStringUtil.object2json(record.getDatas(),builder);
 
 			}

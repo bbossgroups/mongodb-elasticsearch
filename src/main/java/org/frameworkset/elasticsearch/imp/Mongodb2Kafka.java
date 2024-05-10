@@ -30,6 +30,7 @@ import org.frameworkset.tran.config.ImportBuilder;
 import org.frameworkset.tran.context.Context;
 import org.frameworkset.tran.plugin.kafka.output.Kafka2OutputConfig;
 import org.frameworkset.tran.plugin.mongodb.input.MongoDBInputConfig;
+import org.frameworkset.tran.schedule.TaskContext;
 import org.frameworkset.tran.task.TaskCommand;
 import org.frameworkset.tran.util.RecordGenerator;
 
@@ -149,7 +150,7 @@ public class Mongodb2Kafka {
 //指定文件中每条记录格式，不指定默认为json格式输出
 		kafkaOutputConfig.setRecordGenerator(new RecordGenerator() {
 			@Override
-			public void buildRecord(Context taskContext, CommonRecord record, Writer builder) {
+			public void buildRecord(TaskContext taskContext, CommonRecord record, Writer builder) {
 				//record.setRecordKey("xxxxxx"); //指定记录key
 				//直接将记录按照json格式输出到文本文件中
 				SerialUtil.normalObject2json(record.getDatas(),//获取记录中的字段数据并转换为json格式
