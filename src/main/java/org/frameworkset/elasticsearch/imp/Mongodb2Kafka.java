@@ -251,14 +251,14 @@ public class Mongodb2Kafka {
 
 		// 5.2.4.7 设置同步作业结果回调处理函数（可选步骤，可以不需要做以下配置）
 		//设置任务处理结果回调接口
-		importBuilder.setExportResultHandler(new ExportResultHandler<Object,RecordMetadata>() {
+		importBuilder.setExportResultHandler(new ExportResultHandler<RecordMetadata>() {
 			@Override
-			public void success(TaskCommand<Object,RecordMetadata> taskCommand, RecordMetadata result) {
+			public void success(TaskCommand<RecordMetadata> taskCommand, RecordMetadata result) {
 				System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
 			}
 
 			@Override
-			public void error(TaskCommand<Object,RecordMetadata> taskCommand, RecordMetadata result) {
+			public void error(TaskCommand<RecordMetadata> taskCommand, RecordMetadata result) {
 				System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
 				/**
 				//分析result，提取错误数据修改后重新执行,
@@ -270,7 +270,7 @@ public class Mongodb2Kafka {
 			}
 
 			@Override
-			public void exception(TaskCommand<Object, RecordMetadata> taskCommand, Throwable exception) {
+			public void exception(TaskCommand<RecordMetadata> taskCommand, Throwable exception) {
 				System.out.println(taskCommand.getTaskMetrics());//打印任务执行情况
 			}
 

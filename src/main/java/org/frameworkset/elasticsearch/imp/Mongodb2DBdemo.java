@@ -280,20 +280,20 @@ public class Mongodb2DBdemo {
 		importBuilder.setContinueOnError(true);//任务出现异常，是否继续执行作业：true（默认值）继续执行 false 中断作业执行
 
 //设置任务处理结果回调接口
-		importBuilder.setExportResultHandler(new ExportResultHandler<Object,Object>() {
+		importBuilder.setExportResultHandler(new ExportResultHandler<Object>() {
 			@Override
-			public void success(TaskCommand<Object,Object> taskCommand, Object result) {
+			public void success(TaskCommand<Object> taskCommand, Object result) {
 				logger.info(taskCommand.getTaskMetrics().toString());//打印任务执行情况
 			}
 
 			@Override
-			public void error(TaskCommand<Object,Object> taskCommand, Object result) {
+			public void error(TaskCommand<Object> taskCommand, Object result) {
 				logger.info(taskCommand.getTaskMetrics().toString());//打印任务执行情况
 
 			}
 
 			@Override
-			public void exception(TaskCommand<Object,Object> taskCommand, Throwable exception) {
+			public void exception(TaskCommand<Object> taskCommand, Throwable exception) {
 				logger.info(taskCommand.getTaskMetrics().toString(),exception);//打印任务执行情况
 			}
 
