@@ -185,7 +185,7 @@ public class Mongodb2FileFtp {
 			@Override
 			public void buildRecord(TaskContext taskContext, CommonRecord record, Writer builder) {
 				//直接将记录按照json格式输出到文本文件中
-				SerialUtil.normalObject2json(record.getDatas(),//获取记录中的字段数据
+				SerialUtil.object2jsonDisableCloseAndFlush(record.getDatas(),//获取记录中的字段数据
 						builder);
 //				String data = (String)taskContext.getTaskData("data");//从任务上下文中获取本次任务执行前设置时间戳
 //          System.out.println(data);
